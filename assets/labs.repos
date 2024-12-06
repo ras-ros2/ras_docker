@@ -1,0 +1,5 @@
+repositories:
+  oss_asset_lab_oss_labs:
+    type: git
+    url: git@github.com:acceleration-robotics/oss_asset_lab_oss_labs.git
+    version: main
