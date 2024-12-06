@@ -1,133 +1,63 @@
-# OSS
+# OSS Docker Workspace
 
-# oss_docker
+OSS Docker is the main workspace where two applications, **real** and **sim**, can be worked with seamlessly. This document provides an overview of its setup and usage.
 
-### Setup Instructions:
+## 1. Clone the Repository
+```bash
+git clone --recursive https://github.com/ras-ros2/rel_oss_docker
+```
 
- git clone --recursive git@github.com:acceleration-robotics/oss_docker.git
- source oss_docker/env.sh
- odi sim init
- odi sim build # To Build Docker Image
- odi sim build # To Build Ros 2 Packages
- odi sim run # Starts the simulation 
-
-
-### To perform the target poses sequentially 
-
-ros2 run oss_bt_framework batman.py
-
-Poses or targets can be updated multiple times in a simulation session 
-
-### To Update Pose and Targets
-
-Target is the sequence in which execution will take place of the poses.
-
-To modify or add new pose modify user_input.yaml.
-
-File Location:-
-
-/oss_sim_lab/ros2_ws/src/oss_bt_framework/config
-
-
-
-yaml
-Poses:
-  pose1:
-    x: -0.14
-    y: -0.25
-    z: 0.119
-    roll: -3.14
-    pitch: 0
-    yaw: 1.57Poses:
-  pose1:
-    x: -0.14
-    y: -0.25
-    z: 0.119
-    roll: -3.14
-    pitch: 0
-    yaw: 1.57
-  pose2:
-    x: -0.14
-    y: 0.25
-    z: 0.124
-    roll: -3.14
-    pitch: 0
-    yaw: 1.57
-
-targets:
- - pose1
- - pose2
-
-
-
-## Getting Started
-
-### 1. Clone the Repository
-bash
-git clone --recursive git@github.com:acceleration-robotics/oss_docker.git
-
+## OSS Docker Interface (ODI)
+OSS Docker includes a command-line utility called **ODI** (OSS Docker Interface), implemented in `docker_interface.py` under the `scripts` directory.
 
 ### 2. Source the Environment File
-bash
+```bash
 source env.sh
-
+```
 
 ### 3. Check Available Commands
-Use the following command to see what you can do with ODI:
-bash
+To see the available ODI commands, run:
+```bash
 odi -h
+```
 
+## Directory Structure
+### `apps` Directory
+The `apps` directory houses the two applications, **sim** and **real**, which are Docker containers built using the Docker images located in the `context` directory.
 
-## Simulation Setup
+### `context` Directory
+The `context` directory contains the Docker images used to build the applications:
+1. **Dockerfile.base**: Based on the `humble-desktop-full` image, it installs dependencies common to both applications (e.g., `python3-pip`).
+2. **Dockerfile.sim**: Extends `Dockerfile.base` and adds dependencies specific to the **sim** application (e.g., `ignition-fortress`).
+3. **Dockerfile.real**: Extends `Dockerfile.base` and adds dependencies specific to the **real** application.
 
-### 1. Initialize the Simulation
-Initialize the simulation environment which will create the first application under apps as oss_sim_lab:
-bash
+### 4. Check App-Specific Commands
+To see commands specific to an application (e.g., `sim`):
+```bash
+odi sim -h
+```
+
+## Working with the Sim Application
+### 5. Initialize Sim
+```bash
 odi sim init
+```
+This creates a `oss_sim_lab` directory under the `apps` folder.
 
-
-This step will clone all the required repositories.
-
-### 2. Build the Simulation Workspace
-Build the simulation workspace:
-bash
+### 6. Build the Docker Image for the Sim App
+```bash
 odi sim build
+```
 
-
-This will first build the Docker file. Build again to build workspace:
-bash
+### 7. Build the ROS 2 Workspace
+```bash
 odi sim build
+```
+This builds the `src` folder inside the `ros2_ws` directory present in `oss_sim_lab`.
 
-
-### 3. Run the Simulation
-Run the simulation:
-bash
+### 8. Run the Sim Lab
+```bash
 odi sim run
+```
+This starts the container and executes the code defined in the `run.sh` file within `oss_sim_lab`.
 
-
-This will take you inside the Docker environment.
-
-## Behavior Tree (BT) Setup
-
-### 1. Build the Behavior Tree
-Run the following command to build the BT and generate the XML file:
-bash
-ros2 run oss_bt_framework batman.py
-
-
-### 2. Run the Simulation
-Launch the simulation:
-bash
-ros2 launch oss_core main.launch.py
-
-
-### 3. Start the MoveIt Node
-Start the MoveIt node:
-bash
-ros2 run oss_bt_framework ExecuteSim
-
-
-### 4. Execute the Behavior Tree
-Execute the BT using:
-bash
-ros2 run oss_bt_framework executor
