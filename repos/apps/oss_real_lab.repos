@@ -1,0 +1,6 @@
+repositories:
+  oss_real_lab:
+    type: git
+    url: git@github.com:acceleration-robotics/oss_real_lab.git
+    version: main
+    recursive_update: true

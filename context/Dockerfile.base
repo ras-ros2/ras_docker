@@ -1,0 +1,41 @@
+FROM osrf/ros:humble-desktop-full
+
+SHELL ["/bin/bash","-c"]
+
+# installing ignition fortress
+RUN apt-get update && apt-get install -y  ros-humble-moveit \
+    ros-humble-control-msgs \
+    ros-humble-moveit-visual-tools \
+    ros-humble-controller-manager \
+    ros-humble-ros2-controllers \
+    ros-humble-ros2-control \
+    ros-humble-rosbridge-suite \
+    ros-humble-rmw-cyclonedds-cpp \
+    python3-pip \
+    ros-humble-tf-transformations \
+    terminator \
+    ros-humble-ign-ros2-control \
+    ros-humble-behaviortree-cpp \
+    ros-humble-moveit-servo \
+    ros-humble-joy 
+
+RUN pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+RUN pip3 install transforms3d \
+    pycollada \
+    trimesh \
+    py_trees \
+    AWSIoTPythonSDK
+
+RUN apt-get update && apt install -y docker.io 
+
+RUN apt-get update && apt install -y tmux
+
+RUN useradd --shell /bin/bash -u 1001 -c "" -m user && usermod -a -G dialout user
+RUN useradd --shell /bin/bash -u 1000 -c "" -m oss && usermod -a -G dialout oss
+
+USER oss
+RUN touch ~/.tmux.conf && echo "set -g mouse on" >> ~/.tmux.conf
+USER root
+
+
+SHELL ["/bin/bash","-c"]
