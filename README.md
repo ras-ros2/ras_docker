@@ -12,7 +12,7 @@ OSS Docker includes a command-line utility called **ODI** (OSS Docker Interface)
 
 ### 2. Source the Environment File
 ```bash
-source env.sh
+source ./oss_docker/env.sh
 ```
 
 ### 3. Check Available Commands
@@ -61,3 +61,8 @@ odi sim run
 ```
 This starts the container and executes the code defined in the `run.sh` file within `oss_sim_lab`.
 
+### 9. Hack into the container
+```bash
+odi sim dev
+```
+Login to the container, explore and hack your way into the application.
