@@ -4,7 +4,7 @@ OSS Docker is the main workspace where two applications, **real** and **sim**, c
 
 ## 1. Clone the Repository
 ```bash
-git clone --recursive https://github.com/ras-ros2/rel_oss_docker
+git clone --recursive https://github.com/ras-ros2/oss_docker
 ```
 
 ## OSS Docker Interface (ODI)
