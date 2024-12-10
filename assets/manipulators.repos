@@ -1,5 +1,5 @@
 repositories:
   oss_asset_manipulator_xarm_lite6:
     type: git
-    url: git@github.com:acceleration-robotics/oss_asset_manipulator_xarm_lite6.git
+    url: git@github.com:ras-ros2/oss_asset_manipulator_xarm_lite6.git
     version: main
