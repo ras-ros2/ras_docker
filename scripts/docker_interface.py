@@ -7,7 +7,7 @@ from functools import partial
 from enum import Enum
 
 WORKING_PATH = (Path(__file__)/'../..').resolve()
-TAG_SUFFIX = "oss_local"
+TAG_SUFFIX = "ras_local"
 docker_cmd_fmt = """docker run -it --rm \
             -e DISPLAY={display_env} \
             -e ROS_DOMAIN_ID=2 \
@@ -65,7 +65,7 @@ def init_app(args: argparse.Namespace):
     apps_path = WORKING_PATH/'apps'
     repos_path = WORKING_PATH/'repos'
     app_repos_path = repos_path/'apps'
-    app_name = f"oss_{args.app}_lab"
+    app_name = f"ras_{args.app}_lab"
     app_path = apps_path/app_name
     repos_file = app_repos_path/f"{app_name}.repos"
     if not repos_file.exists():
@@ -74,6 +74,30 @@ def init_app(args: argparse.Namespace):
         dep_repos_file = app_path/"deps.repos"
         vcs_fetch_repos(dep_repos_file,app_path/"ros2_ws/src",pull=True)
 
+def get_app_spacific_docker_cmd(args : argparse.Namespace):
+    app_name = f"ras_{args.app}_lab"
+    container_name = f"ras_{args.app}_lab"
+    image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
+    app_path = WORKING_PATH/'apps'/app_name
+    config_dir=str(WORKING_PATH/'configs')
+    asset_dir=str(WORKING_PATH/'assets')
+
+    if not app_path.exists():
+        print(f"Error: {app_path} does not exist")
+        print(f"Please run the init command first")
+        exit(1)
+    extra_docker_args = ""
+    if app_name == "ras_sim_lab":
+        extra_docker_args = f" -v {asset_dir}:/{app_name}/ros2_ws/src/assets "
+    docker_cmd_fmt_local = partial(docker_cmd_fmt,
+        display_env=f"{os.environ['DISPLAY']}",
+        app_dir=str(app_path),
+        work_dir="/"+app_name,
+        container_name=container_name,
+        extra_docker_args=f"-v {config_dir}:/{app_name}/configs {extra_docker_args}",
+        image_name=image_tag,
+    )
+    return docker_cmd_fmt_local
 
 def build_image(args : argparse.Namespace):
     
@@ -86,35 +110,17 @@ def build_image(args : argparse.Namespace):
     if args.clean:
         clean_option = True
 
-    app_name = f"oss_{args.app}_lab"
-    image_name = f"oss_{args.app}_lab"
-    container_name = f"oss_{args.app}_lab"
-    image_tag = f"oss_{args.app}_lab:{TAG_SUFFIX}"
-    app_path = WORKING_PATH/'apps'/app_name
-    config_dir=str(WORKING_PATH/'configs')
-    asset_dir=str(WORKING_PATH/'assets')
+    app_name = f"ras_{args.app}_lab"
+    image_name = f"ras_{args.app}_lab"
+    image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
 
-    if not app_path.exists():
-        print(f"Error: {app_path} does not exist")
-        print(f"Please run the init command first")
-        exit(1)
-    extra_docker_args = ""
-    if app_name == "oss_sim_lab":
-        extra_docker_args = f" -v {asset_dir}:/{app_name}/ros2_ws/src/assets "
-    docker_cmd_fmt_local = partial(docker_cmd_fmt,
-        display_env=f"{os.environ['DISPLAY']}:0",
-        app_dir=str(app_path),
-        work_dir="/"+app_name,
-        container_name=container_name,
-        extra_docker_args=f"-v {config_dir}:/{app_name}/ros2_ws/src/oss_configs {extra_docker_args}",
-        image_name=image_tag,
-    )
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args)
 
     def _build_image():
         print(f"*****Building Existing Docker Image: {image_name}*****")
         context_path = WORKING_PATH/'context'
         app_dockerfile = context_path/f"apps/Dockerfile.{args.app}"
-        subprocess.run(f"docker build -t oss_base:{TAG_SUFFIX} -f Dockerfile.base .",shell=True,cwd=str(context_path))
+        subprocess.run(f"docker build -t ras_base:{TAG_SUFFIX} -f Dockerfile.base .",shell=True,cwd=str(context_path))
         subprocess.run(f"docker build -t {image_tag} -f {app_dockerfile} .",shell=True,cwd=str(context_path))
 
     image_exists = False
@@ -130,7 +136,7 @@ def build_image(args : argparse.Namespace):
 
     
     # else:
-    setup_cmd = f"cd /{app_name} && ./setup.sh"
+    setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
     os.system("xhost +local:root")
     workspace_path = f"/{app_name}/ros2_ws"
     run_command = f"{setup_cmd} && cd {workspace_path} && {workspace_build_cmd} && exit"
@@ -142,7 +148,7 @@ def build_image(args : argparse.Namespace):
     print(f"Building packages from docker file: {image_tag}")
     try:
         docker_cmd = docker_cmd_fmt_local(
-            command=f"/bin/bash -c \"source /{app_name}/env.sh && {run_command}\""
+            command=f"/bin/bash -c \"source /{app_name}/scripts/env.sh && {run_command}\""
         )
         # print(docker_cmd.splitlines())
         assert isinstance(docker_cmd,str)
@@ -152,34 +158,21 @@ def build_image(args : argparse.Namespace):
         print("*****Build error occurred. ./run_image.sh will not be executed*****")
 
 def run_image(args : argparse.Namespace ):
-    app_name = f"oss_{args.app}_lab"
+    app_name = f"ras_{args.app}_lab"
 
     if os.path.isfile(f"/tmp/.{app_name}"):
         print("App Is Already Running")
     else:
         subprocess.run(f"touch /tmp/.{app_name}", shell=True)
-        run_image_command(args=args, command_str=f"bash -c \"source /{app_name}/env.sh && /{app_name}/run.sh\"")
+        run_image_command(args=args, command_str=f"bash -c \"source /{app_name}/scripts/env.sh && /{app_name}/scripts/run.sh\"")
         subprocess.run(f"rm /tmp/.{app_name}", shell=True)
 
 def run_image_command(args : argparse.Namespace, command_str):
 
     os.system("xhost +local:root")
-    app_name = f"oss_{args.app}_lab"
-    container_name = f"oss_{args.app}_lab"
-    image_name = f"{app_name}:{TAG_SUFFIX}"
-    config_dir=str(WORKING_PATH/'configs')
-    asset_dir=str(WORKING_PATH/'assets')
-    extra_docker_args = ""
-    if app_name == "oss_sim_lab":
-        extra_docker_args = f" -v {asset_dir}:/{app_name}/ros2_ws/src/assets "
-    docker_cmd_fmt_local = partial(docker_cmd_fmt,
-        display_env=f"{os.environ['DISPLAY']}",
-        app_dir=str(WORKING_PATH/'apps'/app_name),
-        work_dir="/"+app_name,
-        container_name=container_name,
-        extra_docker_args=f" -v {config_dir}:/{app_name}/ros2_ws/src/oss_configs {extra_docker_args} ",
-        image_name=image_name,
-    )
+    container_name = f"ras_{args.app}_lab"
+    
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args)
 
     command = ["docker", "ps", "--format", "{{.Names}}"]
     output = subprocess.check_output(command).decode("utf-8")
@@ -221,7 +214,7 @@ def get_parser():
 
         return nested_subparsers
         
-    parser = argparse.ArgumentParser(description="Build and run xarm-arm applications")
+    parser = argparse.ArgumentParser(description="RAS Docker Interface.\nBuild and run RAS applications")
     subparsers = parser.add_subparsers(dest="app", help="Application to run/build")
 
     real_parser = subparsers.add_parser("real", help="Real robot application")
@@ -230,12 +223,6 @@ def get_parser():
     sim_parser = subparsers.add_parser("sim", help="Simulation application")
     nested_sim_parsers = add_nested_subparsers(sim_parser)
 
-    setup_parser = subparsers.add_parser("setup", help="Setup interface")
-    nested_subparsers = setup_parser.add_subparsers(dest="command", help="Command to execute")
-
-    nested_setup_parser = nested_subparsers.add_parser("init", help="Initialize the docker repos")
-    # nested_config_parser = nested_subparsers.add_parser("config", help="Configure the setup")
-
     return parser
 
 def parse_args(parser : argparse.ArgumentParser):
@@ -243,11 +230,6 @@ def parse_args(parser : argparse.ArgumentParser):
     if (not hasattr(args, "app")) or isinstance(args.app, type(None)):
         parser.print_help()
         exit(1)
-    if args.app == "setup":
-        if args.command == "init":
-            init_setup(args)
-        else:
-            parser.print_help()
         
     elif args.command == "build":
         build_image(args)

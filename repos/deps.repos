@@ -1,5 +1,5 @@
 repositories:
   configs:
     type: git
-    url: git@github.com:ras-ros2/oss_configs.git
+    url: git@github.com:ras-ros2/ras_configs.git
     version: main

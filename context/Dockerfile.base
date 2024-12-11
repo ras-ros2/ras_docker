@@ -31,9 +31,9 @@ RUN apt-get update && apt install -y docker.io
 RUN apt-get update && apt install -y tmux
 
 RUN useradd --shell /bin/bash -u 1001 -c "" -m user && usermod -a -G dialout user
-RUN useradd --shell /bin/bash -u 1000 -c "" -m oss && usermod -a -G dialout oss
+RUN useradd --shell /bin/bash -u 1000 -c "" -m ras && usermod -a -G dialout ras
 
-USER oss
+USER ras
 RUN touch ~/.tmux.conf && echo "set -g mouse on" >> ~/.tmux.conf
 USER root
 

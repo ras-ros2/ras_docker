@@ -1,11 +1,11 @@
-FROM oss_base:oss_local AS builder
+FROM ras_base:ras_local AS builder
 
-RUN mkdir -p /oss_real_lab
+RUN mkdir -p /ras_real_lab
 
 RUN apt update && apt install -y inetutils-ping
 RUN apt install wget unzip -y
 RUN pip install xArm-Python-SDK
 
-RUN echo "source /oss_real_lab/env.sh" >> /etc/bash.bashrc
+RUN echo "source /ras_real_lab/scripts/env.sh" >> /etc/bash.bashrc
 
 CMD ["sleep", "infinity"]

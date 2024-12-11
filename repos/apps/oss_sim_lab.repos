@@ -1,6 +1,6 @@
 repositories:
-  oss_sim_lab:
+  ras_sim_lab:
     type: git
-    url: git@github.com:ras-ros2/oss_sim_lab.git
+    url: git@github.com:ras-ros2/ras_sim_lab.git
     version: main
     recursive_update: true

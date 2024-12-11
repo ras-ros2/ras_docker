@@ -1,24 +1,24 @@
-# OSS Docker Workspace
+# RAS Docker Workspace
 
-OSS Docker is the main workspace where two applications, **real** and **sim**, can be worked with seamlessly. This document provides an overview of its setup and usage.
+RAS Docker is the main workspace where two applications, **real** and **sim**, can be worked with seamlessly. This document provides an overview of its setup and usage.
 
 ## 1. Clone the Repository
 ```bash
-git clone --recursive https://github.com/ras-ros2/oss_docker
+git clone --recursive https://github.com/ras-ros2/ras_docker
 ```
 
-## OSS Docker Interface (ODI)
-OSS Docker includes a command-line utility called **ODI** (OSS Docker Interface), implemented in `docker_interface.py` under the `scripts` directory.
+## RAS Docker Interface (RDI)
+RAS Docker includes a command-line utility called **RDI** (RAS Docker Interface), implemented in `docker_interface.py` under the `scripts` directory.
 
 ### 2. Source the Environment File
 ```bash
-source ./oss_docker/env.sh
+source ./ras_docker/env.sh
 ```
 
 ### 3. Check Available Commands
-To see the available ODI commands, run:
+To see the available RDI commands, run:
 ```bash
-odi -h
+rdi -h
 ```
 
 ## Directory Structure
@@ -34,35 +34,35 @@ The `context` directory contains the Docker images used to build the application
 ### 4. Check App-Specific Commands
 To see commands specific to an application (e.g., `sim`):
 ```bash
-odi sim -h
+rdi sim -h
 ```
 
 ## Working with the Sim Application
 ### 5. Initialize Sim
 ```bash
-odi sim init
+rdi sim init
 ```
-This creates a `oss_sim_lab` directory under the `apps` folder.
+This creates a `ras_sim_lab` directory under the `apps` folder.
 
 ### 6. Build the Docker Image for the Sim App
 ```bash
-odi sim build
+rdi sim build
 ```
 
 ### 7. Build the ROS 2 Workspace
 ```bash
-odi sim build
+rdi sim build
 ```
-This builds the `src` folder inside the `ros2_ws` directory present in `oss_sim_lab`.
+This builds the `src` folder inside the `ros2_ws` directory present in `ras_sim_lab`.
 
 ### 8. Run the Sim Lab
 ```bash
-odi sim run
+rdi sim run
 ```
-This starts the container and executes the code defined in the `run.sh` file within `oss_sim_lab`.
+This starts the container and executes the code defined in the `run.sh` file within `ras_sim_lab`.
 
 ### 9. Hack into the container
 ```bash
-odi sim dev
+rdi sim dev
 ```
 Login to the container, explore and hack your way into the application.

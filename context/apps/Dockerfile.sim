@@ -1,4 +1,4 @@
-FROM oss_base:oss_local AS builder
+FROM ras_base:ras_local AS builder
 
 RUN apt-get install lsb-release wget gnupg curl -y
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
@@ -6,16 +6,16 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/p
 RUN apt-get update
 RUN apt-get install -y ignition-fortress
 
-RUN mkdir -p /oss_sim_lab
+RUN mkdir -p /ras_sim_lab
 
 RUN pip install boto3 awsiotsdk
 
-RUN echo "source /oss_sim_lab/env.sh" >> /etc/bash.bashrc
+RUN echo "source /ras_sim_lab/scripts/env.sh" >> /etc/bash.bashrc
 
 
 WORKDIR /
 SHELL ["/bin/bash","-c"]
-USER oss
+USER ras
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
     && . ~/.nvm/nvm.sh \
     && nvm install 20 -y
