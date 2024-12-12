@@ -1,5 +1,5 @@
 repositories:
-  ras_asset_lab_ras_labs:
+  ras_asset_lab_oss_labs:
     type: git
-    url: git@github.com:ras-ros2/ras_asset_lab_ras_labs.git
+    url: git@github.com:ras-ros2/ras_asset_lab_oss_labs.git
     version: main
