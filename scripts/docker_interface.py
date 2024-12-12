@@ -15,7 +15,7 @@ docker_cmd_fmt = """docker run -it --rm \
             -v {app_dir}:{work_dir} \
             --name {container_name} \
             --workdir {work_dir}/ros2_ws \
-            --user 1000:1000 \
+            --user {user_id}:{user_id} \
             {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
             {gpu_arg} \
             --network host \
@@ -83,25 +83,28 @@ def init_app(args: argparse.Namespace):
         dep_repos_file = app_path/"deps.repos"
         vcs_fetch_repos(dep_repos_file,app_path,pull=True)
 
-def get_app_spacific_docker_cmd(args : argparse.Namespace):
+def get_app_spacific_docker_cmd(args : argparse.Namespace,extra_docker_args = ""):
     app_name = f"ras_{args.app}_lab"
     container_name = f"ras_{args.app}_lab"
     image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
     app_path = WORKING_PATH/'apps'/app_name
     config_dir=str(WORKING_PATH/'configs')
     asset_dir=str(WORKING_PATH/'assets')
-
+    user_id = 1000
+    if args.root:
+        user_id = 0
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
         print(f"Please run the init command first")
         exit(1)
-    extra_docker_args = ""
+
     if app_name == "ras_sim_lab":
         extra_docker_args = f" -v {asset_dir}:/{app_name}/ros2_ws/src/assets "
     docker_cmd_fmt_local = partial(docker_cmd_fmt,
         display_env=f"{os.environ['DISPLAY']}",
         app_dir=str(app_path),
         work_dir="/"+app_name,
+        user_id=user_id,
         container_name=container_name,
         extra_docker_args=f"-v {config_dir}:/{app_name}/configs {extra_docker_args}",
         image_name=image_tag,
@@ -189,13 +192,16 @@ def run_image_command(args : argparse.Namespace, command_str):
 
     os.system("xhost +local:root")
     container_name = f"ras_{args.app}_lab"
-    
+    app_name = f"ras_{args.app}_lab"
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args)
 
     command = ["docker", "ps", "--format", "{{.Names}}"]
     output = subprocess.check_output(command).decode("utf-8")
     if container_name in output:
-        command = f"docker exec -it {container_name} {command_str}"
+        user_id = 1000
+        if args.root:
+            user_id = 0
+        command = f"docker exec -it -u {user_id}:{user_id} -w /{app_name}/ros2_ws  {container_name} {command_str} "
         subprocess.run(command, shell=True)
     else:
         docker_cmd = docker_cmd_fmt_local(
@@ -229,6 +235,7 @@ def get_parser():
 
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the real robot image")
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
+        nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
 
         return nested_subparsers
         
