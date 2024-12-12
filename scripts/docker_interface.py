@@ -2,7 +2,7 @@ import argparse
 import subprocess
 import os,sys
 from pathlib import Path
-import vcstool,json
+import vcstool,json,yaml
 from functools import partial
 from enum import Enum
 
@@ -56,8 +56,17 @@ def load_docker_common_args():
 def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
     vcs_cmd = f"vcs import --recursive < {repos_file} "
     if pull:
-        vcs_cmd += " && vcs pull ."
-    ret = subprocess.run(vcs_cmd, shell=True, cwd=str(target_path))
+        vcs_cmd += " && vcs pull . ; "
+        yaml_obj = yaml.safe_load(repos_file.open())
+        dirs_to_pull = set()
+        for _k,_v in yaml_obj["repositories"].items():
+            if 'type' in _v and _v['type'] == 'git':
+                _path = Path(_k)
+                if _path.parent != Path('.'): 
+                    dirs_to_pull.add(_k)
+        for _d in dirs_to_pull:
+            vcs_cmd += f" pushd {_d} > /dev/null ; vcs pull . ; popd > /dev/null ; "
+    ret = subprocess.run(vcs_cmd, shell=True, cwd=str(target_path),executable="/bin/bash")
     return ret.returncode==0
 
 def init_app(args: argparse.Namespace):
@@ -160,12 +169,21 @@ def build_image(args : argparse.Namespace):
 def run_image(args : argparse.Namespace ):
     app_name = f"ras_{args.app}_lab"
 
-    if os.path.isfile(f"/tmp/.{app_name}"):
-        print("App Is Already Running")
-    else:
-        subprocess.run(f"touch /tmp/.{app_name}", shell=True)
-        run_image_command(args=args, command_str=f"bash -c \"source /{app_name}/scripts/env.sh && /{app_name}/scripts/run.sh\"")
-        subprocess.run(f"rm /tmp/.{app_name}", shell=True)
+    # if os.path.isfile(f"/tmp/.{app_name}"):
+    #     print("App Is Already Running")
+    # else:
+        
+    #     subprocess.run(f"touch /tmp/.{app_name}", shell=True)
+    bash_cmd = f"""if [ -e /tmp/.RAS_RUN ]
+    then
+        echo App is Already Running
+    else
+        echo Starting App
+        touch /tmp/.RAS_RUN
+        source /{app_name}/scripts/env.sh && /{app_name}/scripts/run.sh
+    fi
+    """
+    run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
 
 def run_image_command(args : argparse.Namespace, command_str):
 
