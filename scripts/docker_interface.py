@@ -91,7 +91,7 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,extra_docker_args = ""
     config_dir=str(WORKING_PATH/'configs')
     asset_dir=str(WORKING_PATH/'assets')
     user_id = 1000
-    if args.root:
+    if hasattr(args,"root") and args.root:
         user_id = 0
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
@@ -199,7 +199,7 @@ def run_image_command(args : argparse.Namespace, command_str):
     output = subprocess.check_output(command).decode("utf-8")
     if container_name in output:
         user_id = 1000
-        if args.root:
+        if hasattr(args,"root") and args.root:
             user_id = 0
         command = f"docker exec -it -u {user_id}:{user_id} -w /{app_name}/ros2_ws  {container_name} {command_str} "
         subprocess.run(command, shell=True)
