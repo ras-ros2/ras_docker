@@ -72,7 +72,7 @@ def init_app(args: argparse.Namespace):
         print(f"Error: {repos_file} does not exist")
     if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
         dep_repos_file = app_path/"deps.repos"
-        vcs_fetch_repos(dep_repos_file,app_path/"ros2_ws/src",pull=True)
+        vcs_fetch_repos(dep_repos_file,app_path,pull=True)
 
 def get_app_spacific_docker_cmd(args : argparse.Namespace):
     app_name = f"ras_{args.app}_lab"
