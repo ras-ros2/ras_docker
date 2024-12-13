@@ -63,7 +63,7 @@ def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
             if 'type' in _v and _v['type'] == 'git':
                 _path = Path(_k)
                 if _path.parent != Path('.'): 
-                    dirs_to_pull.add(_k)
+                    dirs_to_pull.add(_path.parent)
         for _d in dirs_to_pull:
             vcs_cmd += f" pushd {_d} > /dev/null ; vcs pull . ; popd > /dev/null ; "
     ret = subprocess.run(vcs_cmd, shell=True, cwd=str(target_path),executable="/bin/bash")
@@ -147,7 +147,6 @@ def build_image(args : argparse.Namespace):
         _build_image()
 
     
-    # else:
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
     os.system("xhost +local:root")
     workspace_path = f"/{app_name}/ros2_ws"
@@ -167,16 +166,10 @@ def build_image(args : argparse.Namespace):
         subprocess.run(docker_cmd, check=True, shell=True)
         print("*****Build Successful, Ready for execution*****")
     except subprocess.CalledProcessError:
-        print("*****Build error occurred. ./run_image.sh will not be executed*****")
+        print("*****Build error occurred. Image buuild will not be executed*****")
 
 def run_image(args : argparse.Namespace ):
     app_name = f"ras_{args.app}_lab"
-
-    # if os.path.isfile(f"/tmp/.{app_name}"):
-    #     print("App Is Already Running")
-    # else:
-        
-    #     subprocess.run(f"touch /tmp/.{app_name}", shell=True)
     bash_cmd = f"""if [ -e /tmp/.RAS_RUN ]
     then
         echo App is Already Running
@@ -184,6 +177,7 @@ def run_image(args : argparse.Namespace ):
         echo Starting App
         touch /tmp/.RAS_RUN
         source /{app_name}/scripts/env.sh && /{app_name}/scripts/run.sh
+        rm /tmp/.RAS_RUN
     fi
     """
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
