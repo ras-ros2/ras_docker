@@ -23,6 +23,7 @@ docker_cmd_fmt = """docker run -it --rm \
             {image_name} \
             {command}""".format
 
+DOCKERHUB_REPO = "rasros2temp/ras"
 workspace_build_cmd = "colcon build --symlink-install"
 
 class AssetType(Enum):
@@ -69,6 +70,32 @@ def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
     ret = subprocess.run(vcs_cmd, shell=True, cwd=str(target_path),executable="/bin/bash")
     return ret.returncode==0
 
+def docker_check_image_exists(image_tag:str):
+    image_exists = False
+    images = subprocess.check_output(["docker", "images", "--format", "{{.Repository}}:{{.Tag}}"]).decode("utf-8").splitlines()
+    if image_tag in images:
+        image_exists = True
+        image_id = subprocess.check_output(["docker", "images", "--format", "{{.ID}}", "--filter", f"reference={image_tag}"]).decode("utf-8").strip()
+        print(f"Older Image ID: {image_id}")
+        print(f"Found Docker Image: {image_tag}")
+    return image_exists
+
+def docker_pull_image(image_tag:str):
+    ret = subprocess.run(f"docker pull {DOCKERHUB_REPO}:{image_tag}",shell=True)
+    return ret.returncode==0
+
+def pull_from_docker_repo_if_not_exists(image_context:str):
+    image_tag_local = f"{image_context}:ras_local"
+    image_tag_remote = f"{DOCKERHUB_REPO}:{image_context}"
+    if not docker_check_image_exists(image_tag_remote):
+        print(f"Pulling Image: {image_tag_remote}")
+        if not docker_pull_image(image_tag_remote):
+            print(f"Error: Image {image_tag_remote} not found")
+            exit(1)
+        subprocess.run(f"docker tag {image_tag_remote} {image_tag_local}",shell=True)
+    else:
+        print(f"Image {image_tag_remote} already exists")
+
 def init_app(args: argparse.Namespace):
     init_setup(args)
     apps_path = WORKING_PATH/'apps'
@@ -82,6 +109,8 @@ def init_app(args: argparse.Namespace):
     if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
         dep_repos_file = app_path/"deps.repos"
         vcs_fetch_repos(dep_repos_file,app_path,pull=True)
+    pull_from_docker_repo_if_not_exists("ras_base")
+    pull_from_docker_repo_if_not_exists(app_name)
 
 def get_app_spacific_docker_cmd(args : argparse.Namespace,extra_docker_args = ""):
     app_name = f"ras_{args.app}_lab"
@@ -135,16 +164,10 @@ def build_image(args : argparse.Namespace):
         subprocess.run(f"docker build -t ras_base:{TAG_SUFFIX} -f Dockerfile.base .",shell=True,cwd=str(context_path))
         subprocess.run(f"docker build -t {image_tag} -f {app_dockerfile} .",shell=True,cwd=str(context_path))
 
-    image_exists = False
-    images = subprocess.check_output(["docker", "images", "--format", "{{.Repository}}"]).decode("utf-8").splitlines()
-    if image_name in images:
-        image_exists = True
-        image_id = subprocess.check_output(["docker", "images", "--format", "{{.ID}}", "--filter", f"reference={image_name}"]).decode("utf-8").strip()
-        print(f"Older Image ID: {image_id}")
-        print(f"Found Docker Image: {image_tag}")
 
-    if (not image_exists) or force_option:
-        _build_image()
+
+    # if (not image_exists) or force_option:
+    #     _build_image()
 
     
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
@@ -216,6 +239,11 @@ def init_setup(args : argparse.Namespace ):
         asset_repos_file = WORKING_PATH/'repos'/"resources"/"assets"/(f"{_v.value}.repos")
         vcs_fetch_repos(asset_repos_file,asset_dir,pull=True)
 
+def test_func(args : argparse.Namespace):
+    # docker_check_image_exists(f"ras_{args.app}_lab:ras_local")
+    # pull_from_docker_repo_if_not_exists(f"ras_{args.app}_lab")
+    pass
+
 def get_parser():
     def add_nested_subparsers(subparser: argparse.ArgumentParser):
         nested_subparsers = subparser.add_subparsers(dest="command", help="Command to execute")
@@ -230,6 +258,8 @@ def get_parser():
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the real robot image")
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
         nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
+
+        # nested_test_parser = nested_subparsers.add_parser("test", help="Run a test in the container")
 
         return nested_subparsers
         
@@ -258,6 +288,8 @@ def parse_args(parser : argparse.ArgumentParser):
         init_app(args)
     elif args.command == "dev":
         run_image_command(args, "/bin/bash")
+    elif args.command == "test":
+        test_func(args)
     else:
         parser.print_help()
 
