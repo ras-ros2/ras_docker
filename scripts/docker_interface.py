@@ -81,7 +81,7 @@ def docker_check_image_exists(image_tag:str):
     return image_exists
 
 def docker_pull_image(image_tag:str):
-    ret = subprocess.run(f"docker pull {DOCKERHUB_REPO}:{image_tag}",shell=True)
+    ret = subprocess.run(f"docker pull {image_tag}",shell=True)
     return ret.returncode==0
 
 def pull_from_docker_repo_if_not_exists(image_context:str):
@@ -214,6 +214,10 @@ def run_image_command(args : argparse.Namespace, command_str):
     command = ["docker", "ps", "--format", "{{.Names}}"]
     output = subprocess.check_output(command).decode("utf-8")
     if container_name in output:
+        if args.command == "run":
+            print(f"Error: Container {container_name} is already running.")
+            print("`run` command is only allowed to run on the main session to avoid ghost apps.")
+            exit(1)
         user_id = 1000
         if hasattr(args,"root") and args.root:
             user_id = 0
