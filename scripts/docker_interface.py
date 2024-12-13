@@ -163,11 +163,10 @@ def build_image(args : argparse.Namespace):
         app_dockerfile = context_path/f"apps/Dockerfile.{args.app}"
         subprocess.run(f"docker build -t ras_base:{TAG_SUFFIX} -f Dockerfile.base .",shell=True,cwd=str(context_path))
         subprocess.run(f"docker build -t {image_tag} -f {app_dockerfile} .",shell=True,cwd=str(context_path))
-
-
-
-    # if (not image_exists) or force_option:
-    #     _build_image()
+    
+    image_exists = docker_check_image_exists(image_tag)
+    if (not image_exists) or force_option:
+        _build_image()
 
     
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
