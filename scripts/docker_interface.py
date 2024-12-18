@@ -105,10 +105,10 @@ def docker_pull_image(image_tag:str):
     ret = subprocess.run(f"docker pull {image_tag}",shell=True)
     return ret.returncode==0
 
-def pull_from_docker_repo_if_not_exists(image_context:str):
+def pull_from_docker_repo(image_context:str,force=False):
     image_tag_local = f"{image_context}:ras_local"
     image_tag_remote = f"{DOCKERHUB_REPO}:{image_context}"
-    if not docker_check_image_exists(image_tag_remote):
+    if force or (not docker_check_image_exists(image_tag_remote)):
         print(f"Pulling Image: {image_tag_remote}")
         if not docker_pull_image(image_tag_remote):
             print(f"Error: Image {image_tag_remote} not found")
@@ -130,8 +130,9 @@ def init_app(args: argparse.Namespace):
     if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
         dep_repos_file = app_path/"deps.repos"
         vcs_fetch_repos(dep_repos_file,app_path,pull=True)
-    pull_from_docker_repo_if_not_exists("ras_base")
-    pull_from_docker_repo_if_not_exists(app_name)
+    force_pull = (hasattr(args,"image_pull") and args.image_pull)
+    pull_from_docker_repo("ras_base",force_pull)
+    pull_from_docker_repo(app_name,force_pull)
 
 def get_app_spacific_docker_cmd(args : argparse.Namespace,extra_docker_args = ""):
     app_name = f"ras_{args.app}_lab"
@@ -166,7 +167,6 @@ def build_image(args : argparse.Namespace):
     force_option = False
     clean_option = False
     offline_option = False
-
     if args.force:
         force_option = True
     if args.clean:
@@ -193,11 +193,11 @@ def build_image(args : argparse.Namespace):
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
     os.system("xhost +local:root")
     workspace_path = f"/{app_name}/ros2_ws"
-    run_command = f"{setup_cmd} && cd {workspace_path} && {workspace_build_cmd} && exit"
+    run_command = f"{setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
 
     if clean_option:
         print("*****Clean Build Enabled*****")
-        run_command = f"cd {workspace_path} && rm -rf build log install && {setup_cmd} && cd {workspace_path} && {workspace_build_cmd} && exit"
+        run_command = f"cd {workspace_path} && rm -rf build log install && {setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
 
     print(f"Building packages from docker file: {image_tag}")
     try:
@@ -255,7 +255,6 @@ def init_setup(args : argparse.Namespace ):
     repos_file = WORKING_PATH/'repos'/(f"deps.repos")
     vcs_fetch_repos(repos_file,WORKING_PATH,pull=True)
     for _k,_v in AssetType._member_map_.items():
-
         if not isinstance(_v.value,str):
             continue
         asset_dir = WORKING_PATH/'assets'/_k.lower()
@@ -273,6 +272,7 @@ def get_parser():
         nested_subparsers = subparser.add_subparsers(dest="command", help="Command to execute")
 
         nested_init_parser = nested_subparsers.add_parser("init", help="Initialize the application")
+        nested_init_parser.add_argument("--image-pull","-i", action="store_true",default=False,dest="image_pull", help="Force pull the image from the docker repo")
 
         nested_build_parser = nested_subparsers.add_parser("build", help="Build the robot image")
         nested_build_parser.add_argument("--force", action="store_true", help="Force rebuild of the image")
