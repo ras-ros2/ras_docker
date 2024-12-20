@@ -1,0 +1,13 @@
+lab_setup:
+  lab_name: "oss_lab1"
+  robot:
+      name: "xarm_lite6"
+      pose:
+        pos:
+          x: -1.239280
+          y: -3.298410
+          z: 1.120070
+        rot:
+          r: 0.0
+          p: 0.0
+          y: -1.57

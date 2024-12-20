@@ -1,0 +1,15 @@
+ras:
+  real:
+    sim: true
+    real: false
+  transport:
+    ftp:
+      sim:
+        ip: localhost
+        port: 2121
+      real:
+        ip: localhost
+        port: 2122
+    mqtt_broker:
+      ip: localhost
+      port: 2383

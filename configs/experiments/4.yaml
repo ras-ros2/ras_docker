@@ -1,0 +1,157 @@
+Poses:
+  test:
+    x: 0.2
+    y: 0
+    z: 0.5
+    roll: 0
+    pitch: 1.57
+    yaw: 4.71
+  out1:
+    x: 0.2
+    y: 0
+    z: 0.5
+    roll: 3.14
+    pitch: 0
+    yaw: 0
+  above1:
+    x: 0.1
+    y: -0.35
+    z: 0.33
+    roll: 3.14
+    pitch: 0
+    yaw: -1.575
+  in1:
+    x: 0.1
+    y: -0.35
+    z: 0.25
+    roll: 3.14
+    pitch: 0
+    yaw: -1.575
+  out2:
+    x: 0.2
+    y: 0
+    z: 0.5
+    roll: 3.14
+    pitch: 0
+    yaw: -1.575
+  above2:
+    x: 0.40
+    y: 0.0
+    z: 0.37
+    roll: 3.14
+    pitch: 0
+    yaw: -1.575
+
+  in2:
+    x: 0.40
+    y: 0.0
+    z: 0.33
+    roll: 3.14
+    pitch: 0
+    yaw: -1.575
+
+  out3:
+    x: 0.35
+    y: 0
+    z: 0.35
+    roll: 0
+    pitch: -1.57
+    yaw: 1.57
+
+  front3:
+    x: 0.35
+    y: -0.2
+    z: 0.16
+    roll: 0
+    pitch: -1.57
+    yaw: 1.57
+
+  in3:
+    x: 0.3
+    y: -0.35
+    z: 0.16
+    roll: 0
+    pitch: 4.71
+    yaw: 4.71
+
+  up4:
+    x: 0.28
+    y: -0.14
+    z: 0.27
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+
+  left4:
+    x: 0.28
+    y: -0.06
+    z: 0.28
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+
+  above5:
+    x: 0.28
+    y: -0.11
+    z: 0.45
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+
+  out5:
+    x: 0.0
+    y: 0.4
+    z: 0.3
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+  pose6:
+    x: 0.40
+    y: 0.1
+    z: 0.31
+    roll: 3.14
+    pitch: 0
+    yaw: 0
+  pose7:
+    x: 0.1
+    y: -0.13
+    z: 0.13
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+  pose8:
+    x: 0.23
+    y: -0.13
+    z: 0.13
+    roll: 0
+    pitch: 1.57
+    yaw: 0
+
+
+targets:
+  # - test
+  # - out1
+  # - above1
+  # - in1
+  # - grasp
+  # - above1
+  # - out2
+  # - above2
+  # - in2
+  # - release
+  # - above2
+  - out2
+  - out3
+  - front3
+  # - in3
+  # - grasp
+  # - up4
+  # - left4
+  # - -1.57
+  # - 1.57
+  # - above5
+  # - out5
+
+  # - pose5
+  # - pose7
+  # - pose8

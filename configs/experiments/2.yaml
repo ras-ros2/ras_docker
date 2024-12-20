@@ -1,0 +1,63 @@
+Poses:
+  pose1:
+    x: 0.0
+    y: -0.25
+    z: 0.2
+    roll: -1.57
+    pitch: 0.0
+    yaw: 3.14
+  pose2:
+    x: -0.25
+    y: -0.25
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose3:
+    x: -0.25
+    y: 0.0
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose4:
+    x: -0.25
+    y: 0.25
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose5:
+    x: 0.0
+    y: 0.25
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose6:
+    x: 0.25
+    y: 0.25
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose7:
+    x: 0.25
+    y: 0.0
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+  pose8:
+    x: 0.25
+    y: -0.25
+    z: 0.2
+    roll: 3.14
+    pitch: 0
+    yaw: -1.57
+
+
+targets:
+  - pose2
+  # - pose5
+  # - pose6
