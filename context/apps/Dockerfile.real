@@ -14,6 +14,16 @@ RUN apt update && apt install -y inetutils-ping
 RUN apt install wget unzip -y
 RUN pip install xArm-Python-SDK
 
+USER ras
+RUN python3 -m pip install flask pyftpdlib paho-mqtt opencv-contrib-python==4.7.0.72 numpy==1.21.5
+USER root
+
+RUN apt install software-properties-common -y && \ 
+    apt-add-repository ppa:mosquitto-dev/mosquitto-ppa -y && \
+    apt-get update &&  apt install mosquitto -y
+
+RUN  apt install ros-humble-rclpy-message-converter -y 
+
 RUN echo "source /ras_real_lab/scripts/env.sh" >> /etc/bash.bashrc
 
 CMD ["sleep", "infinity"]
