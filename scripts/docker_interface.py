@@ -91,12 +91,16 @@ def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
     if pull:
         vcs_cmd += " && vcs pull . ; "
         yaml_obj = yaml.safe_load(repos_file.open())
+        if not isinstance(yaml_obj,dict) or "repositories" not in yaml_obj:
+            return True
+        yaml_obj = yaml_obj["repositories"]
         dirs_to_pull = set()
-        for _k,_v in yaml_obj["repositories"].items():
-            if 'type' in _v and _v['type'] == 'git':
-                _path = Path(_k)
-                if _path.parent != Path('.'): 
-                    dirs_to_pull.add(_path.parent)
+        if isinstance(yaml_obj,dict):
+            for _k,_v in yaml_obj.items():
+                if 'type' in _v and _v['type'] == 'git':
+                    _path = Path(_k)
+                    if _path.parent != Path('.'): 
+                        dirs_to_pull.add(_path.parent)
         for _d in dirs_to_pull:
             vcs_cmd += f" pushd {_d} > /dev/null ; vcs pull . ; popd > /dev/null ; "
     ret = subprocess.run(vcs_cmd, shell=True, cwd=str(target_path),executable="/bin/bash")

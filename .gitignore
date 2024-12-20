@@ -2,6 +2,5 @@ apps/*
 !apps/.keep
 assets/*
 !assets/.keep
-configs/
 context/build/*
 !context/build/.keep
