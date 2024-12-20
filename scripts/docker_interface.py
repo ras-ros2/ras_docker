@@ -26,23 +26,27 @@ from pathlib import Path
 import vcstool,json,yaml
 from functools import partial
 from enum import Enum
+from dataclasses import dataclass, field, InitVar
 
 WORKING_PATH = (Path(__file__)/'../..').resolve()
 TAG_SUFFIX = "ras_local"
-docker_cmd_fmt = """docker run -it --rm \
+docker_cmd_fmt_prefix = """docker run -it \
             -e DISPLAY={display_env} \
-            -e ROS_DOMAIN_ID=2 \
-            -v /etc/localtime:/etc/localtime:ro \
-            -v {app_dir}:{work_dir} \
-            --name {container_name} \
-            --workdir {work_dir}/ros2_ws \
             --user {user_id}:{user_id} \
-            {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
-            {gpu_arg} \
-            --network host \
-            -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' \
-            {image_name} \
-            {command}""".format
+            -v /etc/localtime:/etc/localtime:ro \
+            --name {container_name} \
+            --workdir {work_dir} \
+            --network host """
+docker_gen_cmd_opts = """ -v {app_dir}:/{container_name}/ \
+                         {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
+                            {gpu_arg} \
+                            -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' """
+docker_cmd_fmt_suffix= """ {image_name} \
+            {command} """
+
+docker_raw_cmd_fmt = (docker_cmd_fmt_prefix + docker_cmd_fmt_suffix).format
+docker_cmd_fmt = (docker_cmd_fmt_prefix+docker_gen_cmd_opts+docker_cmd_fmt_suffix).format
+docker_cmd_login_fmt = "docker exec -it -u {user_id}:{user_id} -w /{work_dir}  {container_name} {command} ".format
 
 DOCKERHUB_REPO = "rasros2temp/ras"
 workspace_build_cmd = "colcon build --symlink-install"
@@ -55,6 +59,7 @@ class AssetType(Enum):
 
 def load_docker_common_args():
     global docker_cmd_fmt
+    global docker_raw_cmd_fmt
 
     daemon_config_path = Path("/etc/docker/daemon.json")
     
@@ -65,6 +70,9 @@ def load_docker_common_args():
             # Check if nvidia runtime is present in Docker's daemon config
             if "nvidia" in config.get("runtimes", {}):
                 nvidia_ctk = True
+    elif Path("/proc/driver/nvidia").exists():
+        print("Warning: Docker Daemon Config not found")
+        print("Warning: Please setup nvidia-ctk.")
     docker_gpu_arg = "--device /dev/dri"
     if(nvidia_ctk):
         docker_gpu_arg = "--gpus all -e NVIDIA_VISIBLE_DEVICES=all \
@@ -73,6 +81,9 @@ def load_docker_common_args():
     docker_cmd_fmt = partial(docker_cmd_fmt,
         display_env=os.environ["DISPLAY"],
         gpu_arg= docker_gpu_arg
+    )
+    docker_raw_cmd_fmt = partial(docker_raw_cmd_fmt,
+        display_env=os.environ["DISPLAY"]
     )
 
 def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
@@ -134,33 +145,53 @@ def init_app(args: argparse.Namespace):
     pull_from_docker_repo("ras_base",force_pull)
     pull_from_docker_repo(app_name,force_pull)
 
-def get_app_spacific_docker_cmd(args : argparse.Namespace,extra_docker_args = ""):
-    app_name = f"ras_{args.app}_lab"
-    container_name = f"ras_{args.app}_lab"
-    image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
-    app_path = WORKING_PATH/'apps'/app_name
+@dataclass
+class CoreDockerConf:
+    image_name:str
+    container_name:str
+    work_dir:str
+
+@dataclass
+class AppCoreConf(CoreDockerConf):
+    app_ns:InitVar[str]
+    image_name:str = field(init=False)
+    container_name:str = field(init=False)
+    work_dir:str = field(init=False)
+    app_name:str = field(init=False)
+
+    def __post_init__(self,app_ns:str):
+        self.app_name = f"ras_{app_ns}_lab"
+        self.image_name = f"ras_{app_ns}_lab:{TAG_SUFFIX}"
+        self.container_name = f"ras_{app_ns}_lab"
+        self.work_dir = f"/{self.app_name}/ros2_ws"
+
+
+def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,remove_cn=True,extra_docker_args = ""):
+    app_conf = AppCoreConf(args.app)
+    app_path = WORKING_PATH/'apps'/app_conf.app_name
     config_dir=str(WORKING_PATH/'configs')
     asset_dir=str(WORKING_PATH/'assets')
-    user_id = 1000
-    if hasattr(args,"root") and args.root:
-        user_id = 0
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
         print(f"Please run the init command first")
         exit(1)
-
-    if app_name == "ras_sim_lab":
-        extra_docker_args = f" -v {asset_dir}:/{app_name}/ros2_ws/src/assets "
-    docker_cmd_fmt_local = partial(docker_cmd_fmt,
+    if remove_cn:
+        extra_docker_args += " --rm "
+    # if app_conf.app_name == "ras_sim_lab":
+    extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
         display_env=f"{os.environ['DISPLAY']}",
         app_dir=str(app_path),
-        work_dir="/"+app_name,
-        user_id=user_id,
-        container_name=container_name,
-        extra_docker_args=f"-v {config_dir}:/{app_name}/configs {extra_docker_args}",
-        image_name=image_tag,
+        work_dir="/"+app_conf.app_name,
+        extra_docker_args=f"-v {config_dir}:/{app_conf.app_name}/configs {extra_docker_args}"
     )
-    return docker_cmd_fmt_local
+    
+    allow_login = args.command in ["dev","run"]
+    docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
+    if isinstance(docker_cmd_fmt_new,type(None)):
+        print("Exiting")
+        exit(1)
+    return docker_cmd_fmt_new
 
 def build_image(args : argparse.Namespace):
     
@@ -176,7 +207,7 @@ def build_image(args : argparse.Namespace):
     image_name = f"ras_{args.app}_lab"
     image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
 
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args)
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
 
     def _build_image():
         print(f"*****Building Existing Docker Image: {image_name}*****")
@@ -191,65 +222,80 @@ def build_image(args : argparse.Namespace):
 
     
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
-    os.system("xhost +local:root")
     workspace_path = f"/{app_name}/ros2_ws"
     run_command = f"{setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
 
     if clean_option:
         print("*****Clean Build Enabled*****")
         run_command = f"cd {workspace_path} && rm -rf build log install && {setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
-
+    command_str =f"/bin/bash -c \"source /{app_name}/scripts/env.sh && {run_command}\""
     print(f"Building packages from docker file: {image_tag}")
-    try:
-        docker_cmd = docker_cmd_fmt_local(
-            command=f"/bin/bash -c \"source /{app_name}/scripts/env.sh && {run_command}\""
-        )
-        # print(docker_cmd.splitlines())
-        assert isinstance(docker_cmd,str)
-        subprocess.run(docker_cmd, check=True, shell=True)
+    
+    status = run_image_command_core(docker_cmd_fmt_local,command_str,as_root=False)
+    if status:
         print("*****Build Successful, Ready for execution*****")
-    except subprocess.CalledProcessError:
+    else:
         print("*****Build error occurred. Image buuild will not be executed*****")
 
-def run_image(args : argparse.Namespace ):
+def run_image_app(args : argparse.Namespace ):
     app_name = f"ras_{args.app}_lab"
-    bash_cmd = f"""if [ -e /tmp/.RAS_RUN ]
-    then
-        echo App is Already Running
-    else
-        echo Starting App
-        touch /tmp/.RAS_RUN
-        source /{app_name}/scripts/env.sh && /{app_name}/scripts/run.sh
-        rm /tmp/.RAS_RUN
-    fi
-    """
+    bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app"
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
 
-def run_image_command(args : argparse.Namespace, command_str):
-
-    os.system("xhost +local:root")
-    container_name = f"ras_{args.app}_lab"
-    app_name = f"ras_{args.app}_lab"
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args)
-
+def check_container_already_running(container_name):
     command = ["docker", "ps", "--format", "{{.Names}}"]
     output = subprocess.check_output(command).decode("utf-8")
-    if container_name in output:
-        if args.command == "run":
-            print(f"Error: Container {container_name} is already running.")
-            print("`run` command is only allowed to run on the main session to avoid ghost apps.")
-            exit(1)
-        user_id = 1000
-        if hasattr(args,"root") and args.root:
-            user_id = 0
-        command = f"docker exec -it -u {user_id}:{user_id} -w /{app_name}/ros2_ws  {container_name} {command_str} "
-        subprocess.run(command, shell=True)
-    else:
-        docker_cmd = docker_cmd_fmt_local(
-            command=command_str
-        )
-        assert isinstance(docker_cmd,str)
-        subprocess.run(docker_cmd,shell=True)
+    return container_name in output
+
+def regen_docker_fmt(docker_cmd_fmt,core_conf:CoreDockerConf,allow_login=False):
+    if check_container_already_running(core_conf.container_name):
+        if not allow_login:
+            print(f"Container {core_conf.container_name} is already running")
+            print("This command is not allowed to run on a running container")
+            return None
+        else:
+            docker_cmd_fmt = docker_cmd_login_fmt
+    docker_cmd_fmt_new = partial(docker_cmd_fmt,
+                                 container_name =core_conf.container_name,
+                                    work_dir = core_conf.work_dir,
+                                    image_name = core_conf.image_name)
+
+    return docker_cmd_fmt_new
+
+def run_image_command_core(docker_command_fmt,command_str,as_root=False):
+    os.system("xhost +local:root")
+    user_id = 1000
+    if as_root:
+        user_id = 0
+    docker_cmd = docker_command_fmt(
+        user_id=user_id,
+        command=command_str
+    )
+    assert isinstance(docker_cmd,str)
+    _cmd_elems = []
+    for _elem in docker_cmd.split(" "):
+        _elem = _elem.strip()
+        if len(_elem) > 0:
+            _cmd_elems.append(_elem)
+    print(f"Running Docker Command: {' '.join(_cmd_elems)}")
+    ret = subprocess.run(docker_cmd,shell=True)
+    return ret.returncode==0
+    
+
+def run_image_command(args : argparse.Namespace, command_str):
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
+    return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=(hasattr(args,"root") and args.root))
+
+def run_image_commits(args : argparse.Namespace):
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_raw_cmd_fmt,remove_cn=False)
+    run_image_command_core(docker_cmd_fmt_local,"/bin/bash",as_root=True)
+    app_conf = AppCoreConf(args.app)
+    ret = subprocess.run(f"docker commit {app_conf.container_name} {app_conf.image_name}",check=True,shell=True)
+    if ret.returncode == 0:
+        print(f"Commited changes to image: {app_conf.image_name}")
+        subprocess.run(f"docker tag {app_conf.image_name} {DOCKERHUB_REPO}:{app_conf.container_name}",check=True,shell=True)
+    subprocess.run(f"docker rm {app_conf.container_name}",shell=True)
+
 
 def init_setup(args : argparse.Namespace ):
     repos_file = WORKING_PATH/'repos'/(f"deps.repos")
@@ -282,6 +328,10 @@ def get_parser():
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the real robot image")
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
         nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
+        nested_dev_parser.add_argument("--commit","-c", action="store_true", help="Commit changes to the image")
+        nested_dev_parser.add_argument("--terminator","-t", action="store_true", help="Open terminal in terminator")
+
+        # nested_push_parser = nested_subparsers.add_parser("push", help="Push the repos ")
 
         # nested_test_parser = nested_subparsers.add_parser("test", help="Run a test in the container")
 
@@ -305,20 +355,30 @@ def parse_args(parser : argparse.ArgumentParser):
         exit(1)
         
     elif args.command == "build":
+        load_docker_common_args()
         build_image(args)
     elif args.command == "run":
-        run_image(args)
+        load_docker_common_args()
+        run_image_app(args)
     elif args.command == "init":
         init_app(args)
     elif args.command == "dev":
-        run_image_command(args, "/bin/bash")
+        load_docker_common_args()
+        if hasattr(args,"commit") and args.commit:
+            run_image_commits(args)
+        elif hasattr(args,"terminator") and args.terminator:
+            run_image_command(args, "/bin/bash -c terminator")
+        else:
+            run_image_command(args, "/bin/bash")
+        
+
     elif args.command == "test":
+        load_docker_common_args()
         test_func(args)
     else:
         parser.print_help()
 
 def main():
-    load_docker_common_args()
     parser = get_parser()
     parse_args(parser)
     

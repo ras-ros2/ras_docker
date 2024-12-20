@@ -19,7 +19,11 @@ USER ras
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
     && . ~/.nvm/nvm.sh \
     && nvm install 20 -y
+RUN python3 -m pip install flask pyftpdlib paho-mqtt
 USER root
+RUN apt install software-properties-common -y && \ 
+    apt-add-repository ppa:mosquitto-dev/mosquitto-ppa -y && \
+    apt-get update &&  apt install mosquitto -y
 RUN touch ~/.tmux.conf && echo "set -g mouse on" >> ~/.tmux.conf
 
 RUN pip install openai
