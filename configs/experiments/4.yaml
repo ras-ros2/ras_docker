@@ -129,29 +129,6 @@ Poses:
 
 
 targets:
-  # - test
-  # - out1
-  # - above1
-  # - in1
-  # - grasp
-  # - above1
-  # - out2
-  # - above2
-  # - in2
-  # - release
-  # - above2
-  - out2
-  - out3
-  - front3
-  # - in3
-  # - grasp
-  # - up4
-  # - left4
-  # - -1.57
-  # - 1.57
-  # - above5
-  # - out5
-
-  # - pose5
-  # - pose7
-  # - pose8
+  - move2pose: out2
+  - move2pose: out3
+  - move2pose: front3

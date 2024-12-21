@@ -58,6 +58,6 @@ Poses:
 
 
 targets:
-  - pose2
-  # - pose5
-  # - pose6
+  - move2pose: pose1
+  - move2pose: pose2
+  - move2pose: pose3
