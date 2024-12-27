@@ -1,7 +1,8 @@
 ras:
   real:
-    sim: true
-    real: false
+    # sim: true
+    # real: false
+    mode: real # sim or real
   transport:
     implementation: default
     ftp:
