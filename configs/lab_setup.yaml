@@ -1,6 +1,6 @@
 lab_setup:
   lab_name: "oss_lab1"
-  robot2:
+  robot:
       name: "xarm_lite6"
       pose:
           x: -1.239280
