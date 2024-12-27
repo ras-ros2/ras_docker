@@ -1,8 +1,10 @@
 ras:
   real:
-    sim: true
-    real: false
+    # sim: true
+    # real: false
+    mode: real # sim or real
   transport:
+    implementation: default
     ftp:
       sim:
         ip: localhost
@@ -10,6 +12,6 @@ ras:
       real:
         ip: localhost
         port: 2122
-    mqtt_broker:
+    mqtt:
       ip: localhost
       port: 2383

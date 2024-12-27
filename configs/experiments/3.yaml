@@ -92,24 +92,25 @@ Poses:
     yaw: 0
 
 targets:
-  - out1
-  - above1
-  - in1
-  - grasp
-  - above1
-  - out2
-  - above2
-  - in2
-  - release
-  - above2
-  - out2
-  - out3
-  - front3
-  - in3
-  - grasp
-  - up4
-  - left4
-  - -1.57
-  - 1.57
-  - above5
-  - out5
+  - move2pose: out1
+  - move2pose: above1
+  - move2pose: in1
+  - gripper: true
+  - move2pose: above1
+  - move2pose: out2 
+  - move2pose: above2
+  - move2pose: in2
+  - gripper: false
+  - move2pose: above2
+  - move2pose: out2
+  - move2pose: out3
+  - move2pose: front3
+  - move2pose: in3
+  - gripper: true
+  - move2pose: up4
+  - move2pose: left4
+  - rotate: -1.57
+  - roatate: 1.57
+  - move2pose: above5
+  - move2pose: out5
+  - gripper: false
