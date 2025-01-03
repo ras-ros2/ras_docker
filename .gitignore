@@ -4,7 +4,4 @@ assets/*
 !assets/.keep
 context/build/*
 !context/build/.keep
-ras_core_pkg/ros2_ws/build
-ras_core_pkg/ros2_ws/install
-ras_core_pkg/ros2_ws/log
-ras_core_pkg/ros2_ws/.vscode
+ras_core_pkg/*

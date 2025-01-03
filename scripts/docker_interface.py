@@ -175,6 +175,7 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
     app_path = WORKING_PATH/'apps'/app_conf.app_name
     config_dir=str(WORKING_PATH/'configs')
     asset_dir=str(WORKING_PATH/'assets')
+    ras_core_pkg_dir = str(WORKING_PATH/'ras_core_pkg')
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
         print(f"Please run the init command first")
@@ -182,7 +183,8 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
     if remove_cn:
         extra_docker_args += " --rm "
     # if app_conf.app_name == "ras_sim_lab":
-    extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets \
+                            -v  {ras_core_pkg_dir}:/{app_conf.app_name}/ros2_ws/src/ras_core_pkg"
     docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
         display_env=f"{os.environ['DISPLAY']}",
         app_dir=str(app_path),
