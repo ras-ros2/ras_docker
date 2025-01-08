@@ -2,5 +2,5 @@ repositories:
   ras_real_lab:
     type: git
     url: git@github.com:ras-ros2/ras_real_lab.git
-    version: main
+    version: dev
     recursive_update: true
