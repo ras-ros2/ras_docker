@@ -1,0 +1,12 @@
+{
+	"workspaceFolder": "/ras_sim_lab/ros2_ws",
+	"extensions": [
+		"github.copilot",
+		"github.copilot-chat",
+		"ms-iot.vscode-ros",
+		"ms-python.debugpy",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-vscode.cpptools"
+	]
+}

@@ -28,7 +28,7 @@ from functools import partial
 from enum import Enum
 from dataclasses import dataclass, field, InitVar
 
-WORKING_PATH = (Path(__file__)/'../..').resolve()
+WORKING_PATH = (Path(__file__)/'../..').resolve().absolute()
 TAG_SUFFIX = "ras_local"
 docker_cmd_fmt_prefix = """docker run -it \
             -e DISPLAY={display_env} \
@@ -189,7 +189,6 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
         work_dir="/"+app_conf.app_name,
         extra_docker_args=f"-v {config_dir}:/{app_conf.app_name}/configs {extra_docker_args}"
     )
-    
     allow_login = args.command in ["dev","run"]
     docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
     if isinstance(docker_cmd_fmt_new,type(None)):
@@ -288,7 +287,18 @@ def run_image_command_core(docker_command_fmt,command_str,as_root=False):
 
 def run_image_command(args : argparse.Namespace, command_str):
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
-    return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=(hasattr(args,"root") and args.root))
+    as_root=(hasattr(args,"root") and args.root)
+    if hasattr(args,"vscode") and args.vscode:
+        if as_root:
+            print("Error: Cannot run vscode as root")
+            exit(1)
+        container_name = docker_cmd_fmt_local.keywords["container_name"]
+        dev_container_path = WORKING_PATH/'.devcontainer'/container_name
+        container_conf_path = Path.home()/f".config/Code/User/globalStorage/ms-vscode-remote.remote-containers/imageConfigs/"
+        container_conf_path.mkdir(parents=True,exist_ok=True)
+        vscode_cmd = f" cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}%3a{TAG_SUFFIX}.json && code {dev_container_path}/{container_name}.code-workspace"
+        subprocess.run(vscode_cmd,shell=True)
+    return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=as_root)
 
 def run_image_commits(args : argparse.Namespace):
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_raw_cmd_fmt,remove_cn=False)
@@ -334,6 +344,7 @@ def get_parser():
         nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
         nested_dev_parser.add_argument("--commit","-c", action="store_true", help="Commit changes to the image")
         nested_dev_parser.add_argument("--terminator","-t", action="store_true", help="Open terminal in terminator")
+        nested_dev_parser.add_argument("--vscode","-v", action="store_true", help="Attach container in vscode")
 
         # nested_push_parser = nested_subparsers.add_parser("push", help="Push the repos ")
 
