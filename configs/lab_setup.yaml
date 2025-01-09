@@ -1,5 +1,6 @@
 lab_setup:
   lab_name: "oss_lab1"
+  real_sim: "aruco_world"
   robot:
       name: "xarm_lite6"
       pose:
