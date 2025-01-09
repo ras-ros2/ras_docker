@@ -1,0 +1,15 @@
+{
+    "image" : "ras_real_lab:ras_local",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-iot.vscode-ros",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                // add your own extensions here (ai/copilot)
+            ]
+                
+        }
+    }
+}
