@@ -286,18 +286,21 @@ def run_image_command_core(docker_command_fmt,command_str,as_root=False):
     
 
 def run_image_command(args : argparse.Namespace, command_str):
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
+    app_conf = AppCoreConf(args.app)
+    extra_docker_args = ""
     as_root=(hasattr(args,"root") and args.root)
     if hasattr(args,"vscode") and args.vscode:
         if as_root:
             print("Error: Cannot run vscode as root")
             exit(1)
-        container_name = docker_cmd_fmt_local.keywords["container_name"]
-        dev_container_path = WORKING_PATH/'.devcontainer'/container_name
+        container_name = app_conf.container_name
         container_conf_path = Path.home()/f".config/Code/User/globalStorage/ms-vscode-remote.remote-containers/imageConfigs/"
         container_conf_path.mkdir(parents=True,exist_ok=True)
+        dev_container_path = WORKING_PATH/'.devcontainer'/container_name
+        extra_docker_args = f" -v {dev_container_path}/.vscode:/home/ras/.vscode-server "
         vscode_cmd = f" cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}%3a{TAG_SUFFIX}.json && code {dev_container_path}/{container_name}.code-workspace"
         subprocess.run(vscode_cmd,shell=True)
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt,extra_docker_args=extra_docker_args)
     return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=as_root)
 
 def run_image_commits(args : argparse.Namespace):
@@ -340,6 +343,8 @@ def get_parser():
         # nested_build_parser.add_argument("--offline", action="store_true", help="Build the image offline")
 
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the real robot image")
+        nested_run_parser.add_argument("args", nargs=argparse.REMAINDER, help="Arguments to pass to the run command")
+
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
         nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
         nested_dev_parser.add_argument("--commit","-c", action="store_true", help="Commit changes to the image")
