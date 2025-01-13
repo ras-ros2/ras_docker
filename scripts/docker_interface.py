@@ -242,7 +242,7 @@ def build_image(args : argparse.Namespace):
 
 def run_image_app(args : argparse.Namespace ):
     app_name = f"ras_{args.app}_lab"
-    bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app"
+    bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app " + " ".join(args.args)
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
 
 def check_container_already_running(container_name):
