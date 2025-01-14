@@ -1,0 +1,5 @@
+repositories:
+  ras_asset_manipulator_xarm_lite6:
+    type: git
+    url: git@github.com:ras-ros2/ras_asset_manipulator_xarm_lite6.git
+    version: main
