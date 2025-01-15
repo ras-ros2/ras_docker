@@ -1,6 +1,3 @@
-apps/*
-!apps/.keep
-assets/*
-!assets/.keep
-context/build/*
-!context/build/.keep
+./apps/
+./assets/
+./context/build/

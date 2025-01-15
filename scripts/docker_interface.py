@@ -29,6 +29,8 @@ from enum import Enum
 from dataclasses import dataclass, field, InitVar
 
 WORKING_PATH = (Path(__file__)/'../..').resolve().absolute()
+WORKSPACE_PATH = WORKING_PATH/"ros2_ws"
+CORE_PKGS_PATH = WORKING_PATH/"ros2_ws"/"src"/"core_pkgs"
 TAG_SUFFIX = "ras_local"
 docker_cmd_fmt_prefix = """docker run -it \
             -e DISPLAY={display_env} \
@@ -40,7 +42,7 @@ docker_cmd_fmt_prefix = """docker run -it \
 docker_gen_cmd_opts = """ -v {app_dir}:/{container_name}/ \
                          {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
                             {gpu_arg} \
-                            -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' """
+                            -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' """ + f" -v {CORE_PKGS_PATH}:/{{container_mame}}/ros2_ws/src/core_pkgs "
 docker_cmd_fmt_suffix= """ {image_name} \
             {command} """
 
@@ -135,9 +137,10 @@ def pull_from_docker_repo(image_context:str,force=False):
 def init_app(args: argparse.Namespace):
     init_setup(args)
     apps_path = WORKING_PATH/'apps'
+    apps_path.mkdir(parents=True,exist_ok=True)
     repos_path = WORKING_PATH/'repos'
     app_repos_path = repos_path/'apps'
-    app_name = f"ras_{args.app}_lab"
+    app_name = f"ras_{args.app}_app"
     app_path = apps_path/app_name
     repos_file = app_repos_path/f"{app_name}.repos"
     if not repos_file.exists():
@@ -164,9 +167,9 @@ class AppCoreConf(CoreDockerConf):
     app_name:str = field(init=False)
 
     def __post_init__(self,app_ns:str):
-        self.app_name = f"ras_{app_ns}_lab"
-        self.image_name = f"ras_{app_ns}_lab:{TAG_SUFFIX}"
-        self.container_name = f"ras_{app_ns}_lab"
+        self.app_name = f"ras_{app_ns}_app"
+        self.image_name = f"ras_{app_ns}_app:{TAG_SUFFIX}"
+        self.container_name = f"ras_{app_ns}_app"
         self.work_dir = f"/{self.app_name}/ros2_ws"
 
 
@@ -181,7 +184,7 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
         exit(1)
     if remove_cn:
         extra_docker_args += " --rm "
-    # if app_conf.app_name == "ras_sim_lab":
+    # if app_conf.app_name == "ras_server_app":
     extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
     docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
         display_env=f"{os.environ['DISPLAY']}",
@@ -206,9 +209,9 @@ def build_image(args : argparse.Namespace):
     if args.clean:
         clean_option = True
 
-    app_name = f"ras_{args.app}_lab"
-    image_name = f"ras_{args.app}_lab"
-    image_tag = f"ras_{args.app}_lab:{TAG_SUFFIX}"
+    app_name = f"ras_{args.app}_app"
+    image_name = f"ras_{args.app}_app"
+    image_tag = f"ras_{args.app}_app:{TAG_SUFFIX}"
 
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
 
@@ -241,7 +244,7 @@ def build_image(args : argparse.Namespace):
         print("*****Build error occurred. Image buuild will not be executed*****")
 
 def run_image_app(args : argparse.Namespace ):
-    app_name = f"ras_{args.app}_lab"
+    app_name = f"ras_{args.app}_app"
     bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app " + " ".join(args.args)
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
 
@@ -316,18 +319,23 @@ def run_image_commits(args : argparse.Namespace):
 
 def init_setup(args : argparse.Namespace ):
     repos_file = WORKING_PATH/'repos'/(f"deps.repos")
-    vcs_fetch_repos(repos_file,WORKING_PATH,pull=True)
+    if repos_file.exists():
+        vcs_fetch_repos(repos_file,WORKING_PATH,pull=True)
+    assets_dir = WORKING_PATH/"assets"
+    assets_dir.mkdir(parents=True,exist_ok=True)
     for _k,_v in AssetType._member_map_.items():
         if not isinstance(_v.value,str):
             continue
-        asset_dir = WORKING_PATH/'assets'/_k.lower()
-        asset_dir.mkdir(exist_ok=True)
+        asset_dir = assets_dir/_k.lower()
+        asset_dir.mkdir(exist_ok=True,parents=True)
         asset_repos_file = WORKING_PATH/'repos'/"resources"/"assets"/(f"{_v.value}.repos")
         vcs_fetch_repos(asset_repos_file,asset_dir,pull=True)
+    CORE_PKGS_PATH.mkdir(exist_ok=True,parents=True)
+    vcs_fetch_repos(WORKING_PATH/'repos'/"ros2.repos",CORE_PKGS_PATH,pull=True)
 
 def test_func(args : argparse.Namespace):
-    # docker_check_image_exists(f"ras_{args.app}_lab:ras_local")
-    # pull_from_docker_repo_if_not_exists(f"ras_{args.app}_lab")
+    # docker_check_image_exists(f"ras_{args.app}_app:ras_local")
+    # pull_from_docker_repo_if_not_exists(f"ras_{args.app}_app")
     pass
 
 def get_parser():
@@ -342,7 +350,7 @@ def get_parser():
         nested_build_parser.add_argument("--clean", action="store_true", help="Clean up intermediate build files")
         # nested_build_parser.add_argument("--offline", action="store_true", help="Build the image offline")
 
-        nested_run_parser = nested_subparsers.add_parser("run", help="Run the real robot image")
+        nested_run_parser = nested_subparsers.add_parser("run", help="Run the robot robot image")
         nested_run_parser.add_argument("args", nargs=argparse.REMAINDER, help="Arguments to pass to the run command")
 
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
@@ -360,10 +368,10 @@ def get_parser():
     parser = argparse.ArgumentParser(description="RAS Docker Interface.\nBuild and run RAS applications")
     subparsers = parser.add_subparsers(dest="app", help="Application to run/build")
 
-    real_parser = subparsers.add_parser("real", help="Real robot application")
+    real_parser = subparsers.add_parser("robot", help="robot robot application")
     nested_real_parsers = add_nested_subparsers(real_parser)
 
-    sim_parser = subparsers.add_parser("sim", help="Simulation application")
+    sim_parser = subparsers.add_parser("server", help="Simulation application")
     nested_sim_parsers = add_nested_subparsers(sim_parser)
 
     return parser

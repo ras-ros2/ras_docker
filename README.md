@@ -1,6 +1,6 @@
 # RAS Docker Workspace
 
-RAS Docker is the main workspace where two applications, **real** and **sim**, can be worked with seamlessly. This document provides an overview of its setup and usage.
+RAS Docker is the main workspace where two applications, **robot** and **server**, can be worked with seamlessly. This document provides an overview of its setup and usage.
 
 ## 1. Clone the Repository
 ```bash
@@ -23,46 +23,46 @@ rdi -h
 
 ## Directory Structure
 ### `apps` Directory
-The `apps` directory houses the two applications, **sim** and **real**, which are Docker containers built using the Docker images located in the `context` directory.
+The `apps` directory houses the two applications, **server** and **robot**, which are Docker containers built using the Docker images located in the `context` directory.
 
 ### `context` Directory
 The `context` directory contains the Docker images used to build the applications:
 1. **Dockerfile.base**: Based on the `humble-desktop-full` image, it installs dependencies common to both applications (e.g., `python3-pip`).
-2. **Dockerfile.sim**: Extends `Dockerfile.base` and adds dependencies specific to the **sim** application (e.g., `ignition-fortress`).
-3. **Dockerfile.real**: Extends `Dockerfile.base` and adds dependencies specific to the **real** application.
+2. **Dockerfile.server**: Extends `Dockerfile.base` and adds dependencies specific to the **server** application (e.g., `ignition-fortress`).
+3. **Dockerfile.robot**: Extends `Dockerfile.base` and adds dependencies specific to the **robot** application.
 
 ### 4. Check App-Specific Commands
-To see commands specific to an application (e.g., `sim`):
+To see commands specific to an application (e.g., `server`):
 ```bash
-rdi sim -h
+rdi server -h
 ```
 
-## Working with the Sim Application
-### 5. Initialize Sim
+## Working with the Server Application
+### 5. Initialize Server
 ```bash
-rdi sim init
+rdi server init
 ```
-This creates a `ras_sim_lab` directory under the `apps` folder.
+This creates a `ras_server_app` directory under the `apps` folder.
 
-### 6. Build the Docker Image for the Sim App
+### 6. Build the Docker Image for the Server App
 ```bash
-rdi sim build
+rdi server build
 ```
 
 ### 7. Build the ROS 2 Workspace
 ```bash
-rdi sim build
+rdi server build
 ```
-This builds the `src` folder inside the `ros2_ws` directory present in `ras_sim_lab`.
+This builds the `src` folder inside the `ros2_ws` directory present in `ras_server_app`.
 
-### 8. Run the Sim Lab
+### 8. Run the Server Lab
 ```bash
-rdi sim run
+rdi server run
 ```
-This starts the container and executes the code defined in the `run.sh` file within `ras_sim_lab`.
+This starts the container and executes the code defined in the `run.sh` file within `ras_server_app`.
 
 ### 9. Hack into the container
 ```bash
-rdi sim dev
+rdi server dev
 ```
 Login to the container, explore and hack your way into the application.

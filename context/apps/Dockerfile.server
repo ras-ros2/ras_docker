@@ -6,11 +6,11 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/p
 RUN apt-get update
 RUN apt-get install -y ignition-fortress
 
-RUN mkdir -p /ras_sim_lab
+RUN mkdir -p /ras_server_app
 
 RUN pip install boto3 awsiotsdk
 
-RUN echo "source /ras_sim_lab/scripts/env.sh" >> /etc/bash.bashrc
+RUN echo "source /ras_server_app/scripts/env.sh" >> /etc/bash.bashrc
 
 
 WORKDIR /

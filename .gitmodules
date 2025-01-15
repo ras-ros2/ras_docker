@@ -1,3 +1,0 @@
-[submodule "repos/resources"]
-	path = repos/resources
-	url = git@github.com:ras-ros2/ras_resources.git
