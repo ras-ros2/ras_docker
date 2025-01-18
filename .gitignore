@@ -1,4 +1,5 @@
-./apps/
-./assets/
-./context/build/
+/apps/
+/assets/
+/ros2_pkgs/
+/context/build/
 __pycache__/
