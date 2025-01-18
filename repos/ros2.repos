@@ -3,3 +3,11 @@ repositories:
     type: git
     url: git@github.com:ras-ros2/ras_core_pkgs.git
     version: dev
+  ras_sim:
+    type: git
+    url: git@github.com:ras-ros2/ras_sim.git
+    version: reorg
+  ras_bt_framework:
+    type: git
+    url: git@github.com:ras-ros2/ras_bt_framework.git
+    version: btf2
