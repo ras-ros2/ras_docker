@@ -1,13 +1,13 @@
 {
 	"folders": [
 		{
-			"uri": "vscode-remote://attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f7265616c5f6c6162227d/ras_robot_app/ros2_ws"
+			"uri": "vscode-remote://attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f726f626f745f617070227d/ras_robot_app/ros2_ws"
 		},
 		{
-			"uri": "vscode-remote://attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f7265616c5f6c6162227d/ras_robot_app"
+			"uri": "vscode-remote://attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f726f626f745f617070227d/ras_robot_app"
 		}
 	],
-	"remoteAuthority": "attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f7265616c5f6c6162227d",
+	"remoteAuthority": "attached-container+7b22636f6e7461696e65724e616d65223a222f7261735f726f626f745f617070227d",
 	"settings": {
 		"python.autoComplete.extraPaths": [
 			"/ras_server_app/ros2_ws/install/xarm_msgs/local/lib/python3.10/dist-packages",
