@@ -20,10 +20,10 @@ Email: info@opensciencestack.org
 """
 
 from .arg_parser import argparse
-from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path
+from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType
 from .vcs import init_setup,vcs_fetch_repos
-from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,docker_cmd_fmt,CoreDockerConf,\
-        docker_check_image_exists,run_image_command_core,docker_raw_cmd_fmt,DOCKERHUB_REPO
+from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDockerConf,\
+        docker_check_image_exists,run_image_command_core,DOCKERHUB_REPO
 from dataclasses import dataclass, field, InitVar
 
 def init_app(args: argparse.Namespace):
@@ -83,8 +83,7 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
     allow_login = args.command in ["dev","run"]
     docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
     if isinstance(docker_cmd_fmt_new,type(None)):
-        print("Exiting")
-        exit(1)
+        raise ValueError("Invalid fmt, expected callable.")
     return docker_cmd_fmt_new
 
 
@@ -102,7 +101,7 @@ def build_image_app(args : argparse.Namespace):
     image_name = f"ras_{args.app}_app"
     image_tag = f"ras_{args.app}_app:{TAG_SUFFIX}"
 
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt)
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,get_docker_cmd_fmt(DockerCmdType.FULL))
 
     def _build_image():
         print(f"*****Building Existing Docker Image: {image_name}*****")
@@ -125,7 +124,6 @@ def build_image_app(args : argparse.Namespace):
         run_command = f"cd {workspace_path} && rm -rf build log install && {setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
     command_str =f"/bin/bash -c \"source /{app_name}/scripts/env.sh && {run_command}\""
     print(f"Building packages from docker file: {image_tag}")
-    
     status = run_image_command_core(docker_cmd_fmt_local,command_str,as_root=False)
     if status:
         print("*****Build Successful, Ready for execution*****")
@@ -148,11 +146,11 @@ def run_image_command(args : argparse.Namespace, command_str):
         extra_docker_args = f" -v {dev_container_path}/.vscode:/home/ras/.vscode-server "
         vscode_cmd = f" cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}%3a{TAG_SUFFIX}.json && code {dev_container_path}/{container_name}.code-workspace"
         subprocess.run(vscode_cmd,shell=True)
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_cmd_fmt,extra_docker_args=extra_docker_args)
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,get_docker_cmd_fmt(DockerCmdType.FULL),extra_docker_args=extra_docker_args)
     return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=as_root)
 
 def run_image_commits(args : argparse.Namespace):
-    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,docker_raw_cmd_fmt,remove_cn=False)
+    docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,get_docker_cmd_fmt(DockerCmdType.RAW),remove_cn=False)
     run_image_command_core(docker_cmd_fmt_local,"/bin/bash",as_root=True)
     app_conf = AppCoreConf(args.app)
     ret = subprocess.run(f"docker commit {app_conf.container_name} {app_conf.image_name}",check=True,shell=True)

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+# PYTHON_ARGCOMPLETE_OK
 """
 Copyright (C) 2024 Harsh Davda
 
@@ -19,7 +22,8 @@ Harsh Davda
 Email: info@opensciencestack.org
 """
 
-import argparse
+
+import argparse, argparse
 import subprocess
 import os,sys
 from pathlib import Path

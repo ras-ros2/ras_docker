@@ -19,31 +19,12 @@ Harsh Davda
 Email: info@opensciencestack.org
 """
 
-from .common import Path,partial,get_display_var,subprocess,ROS2_PKGS_PATH
+from .common import Path,partial,get_display_var,subprocess,ROS2_PKGS_PATH,get_docker_cmd_fmt,DockerCmdType
 import json
 from dataclasses import dataclass
 import os
 
-docker_cmd_fmt_prefix = """docker run -it \
-            -e DISPLAY={display_env} \
-            --user {user_id}:{user_id} \
-            -v /etc/localtime:/etc/localtime:ro \
-            --name {container_name} \
-            --workdir {work_dir} \
-            --network host """
-docker_gen_cmd_opts = """ -v {app_dir}:/{container_name}/ \
-                         {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
-                            {gpu_arg} \
-                            -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' """ + f" -v {ROS2_PKGS_PATH}:/{{container_mame}}/ros2_ws/src/core_pkgs "
-docker_cmd_fmt_suffix= """ {image_name} \
-            {command} """
-
-docker_raw_cmd_fmt = (docker_cmd_fmt_prefix + docker_cmd_fmt_suffix).format
-docker_cmd_fmt = (docker_cmd_fmt_prefix+docker_gen_cmd_opts+docker_cmd_fmt_suffix).format
-docker_cmd_login_fmt = "docker exec -it -u {user_id}:{user_id} -w /{work_dir}  {container_name} {command} ".format
-
 DOCKERHUB_REPO = "rasros2temp/ras"
-
 TAG_SUFFIX = "ras_local"
 
 
@@ -52,36 +33,6 @@ class CoreDockerConf:
     image_name:str
     container_name:str
     work_dir:str
-
-def load_docker_common_args():
-    global docker_cmd_fmt
-    global docker_raw_cmd_fmt
-
-    daemon_config_path = Path("/etc/docker/daemon.json")
-    
-    nvidia_ctk = False
-    if daemon_config_path.exists():
-        with daemon_config_path.open() as f:
-            config = json.load(f)
-            # Check if nvidia runtime is present in Docker's daemon config
-            if "nvidia" in config.get("runtimes", {}):
-                nvidia_ctk = True
-    elif Path("/proc/driver/nvidia").exists():
-        print("Warning: Docker Daemon Config not found")
-        print("Warning: Please setup nvidia-ctk.")
-    docker_gpu_arg = "--device /dev/dri"
-    if(nvidia_ctk):
-        docker_gpu_arg = "--gpus all -e NVIDIA_VISIBLE_DEVICES=all \
-            -e NVIDIA_DRIVER_CAPABILITIES=all \
-            --runtime nvidia"
-    docker_cmd_fmt = partial(docker_cmd_fmt,
-        display_env=get_display_var(),
-        gpu_arg= docker_gpu_arg
-    )
-    docker_raw_cmd_fmt = partial(docker_raw_cmd_fmt,
-        display_env=get_display_var()
-    )
-
 
 def docker_check_image_exists(image_tag:str):
     image_exists = False
@@ -122,12 +73,11 @@ def regen_docker_fmt(docker_cmd_fmt,core_conf:CoreDockerConf,allow_login=False):
             print("This command is not allowed to run on a running container")
             return None
         else:
-            docker_cmd_fmt = docker_cmd_login_fmt
+            docker_cmd_fmt = get_docker_cmd_fmt(DockerCmdType.ATTACH)
     docker_cmd_fmt_new = partial(docker_cmd_fmt,
                                  container_name =core_conf.container_name,
                                     work_dir = core_conf.work_dir,
                                     image_name = core_conf.image_name)
-
     return docker_cmd_fmt_new
 
 

@@ -18,9 +18,9 @@ For inquiries or further information, you may contact:
 Harsh Davda
 Email: info@opensciencestack.org
 """
+# PYTHON_ARGCOMPLETE_OK
 
-import argparse
-from .docker import load_docker_common_args
+import argcomplete, argparse
 from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits
 def get_parser(test_func_en = False):
     def add_nested_subparsers(subparser: argparse.ArgumentParser):
@@ -58,6 +58,7 @@ def get_parser(test_func_en = False):
     sim_parser = subparsers.add_parser("server", help="Simulation application")
     nested_sim_parsers = add_nested_subparsers(sim_parser)
 
+    argcomplete.autocomplete(parser)
     return parser
 
 def parse_args(parser : argparse.ArgumentParser,test_func = None):
@@ -67,15 +68,12 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
         exit(1)
         
     elif args.command == "build":
-        load_docker_common_args()
         build_image_app(args)
     elif args.command == "run":
-        load_docker_common_args()
         run_image_app(args)
     elif args.command == "init":
         init_app(args)
     elif args.command == "dev":
-        load_docker_common_args()
         if hasattr(args,"commit") and args.commit:
             run_image_commits(args)
         elif hasattr(args,"terminator") and args.terminator:
@@ -84,7 +82,6 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
             run_image_command(args, "/bin/bash")
     
     elif args.command == "test":
-        load_docker_common_args()
         if callable(test_func):
             test_func(args)
         else:
