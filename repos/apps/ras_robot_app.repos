@@ -1,6 +1,0 @@
-repositories:
-  ras_robot_app:
-    type: git
-    url: git@github.com:ras-ros2/ras_real_lab.git
-    version: reorg
-    recursive_update: true
