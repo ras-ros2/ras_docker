@@ -21,7 +21,7 @@ Email: info@opensciencestack.org
 
 from .arg_parser import argparse
 from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType
-from .vcs import init_setup,vcs_fetch_repos
+from .vcs import init_setup,init_app_setup
 from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDockerConf,\
         docker_check_image_exists,run_image_command_core,DOCKERHUB_REPO
 from dataclasses import dataclass, field, InitVar
@@ -34,12 +34,13 @@ def init_app(args: argparse.Namespace):
     app_repos_path = repos_path/'apps'
     app_name = f"ras_{args.app}_app"
     app_path = apps_path/app_name
-    repos_file = app_repos_path/f"{app_name}.repos"
-    if not repos_file.exists():
-        print(f"Error: {repos_file} does not exist")
-    if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
-        dep_repos_file = app_path/"deps.repos"
-        vcs_fetch_repos(dep_repos_file,app_path,pull=True)
+    init_app_setup(args)
+    # repos_file = app_repos_path/f"{app_name}.repos"
+    # if not repos_file.exists():
+    #     print(f"Error: {repos_file} does not exist")
+    # if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
+    #     dep_repos_file = app_path/"deps.repos"
+    #     vcs_fetch_repos(dep_repos_file,app_path,pull=True)
     force_pull = (hasattr(args,"image_pull") and args.image_pull)
     pull_from_docker_repo("ras_base",force_pull)
     pull_from_docker_repo(app_name,force_pull)

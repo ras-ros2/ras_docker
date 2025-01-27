@@ -9,9 +9,9 @@ def test_func(args : argparse.Namespace):
 
 
 def main():
-    test()
-    # parser = get_parser(test_func_en=True)
-    # parse_args(parser,test_func)
+    # test()
+    parser = get_parser(test_func_en=True)
+    parse_args(parser,test_func)
     
 if __name__ == "__main__":
     main()

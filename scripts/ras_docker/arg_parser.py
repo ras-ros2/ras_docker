@@ -22,7 +22,7 @@ Email: info@opensciencestack.org
 
 import argcomplete, argparse
 from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits
-from .vcs import init_setup,clear_setup
+from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode
 supported_apps = ["robot","server"]
 
 def get_parser(test_func_en = False):
@@ -77,13 +77,13 @@ def get_parser(test_func_en = False):
     cmd_vcs_subparsers = vcs_parser.add_subparsers(title="vcs",dest="vcs", help="VCS commands")
 
     url_parser = cmd_vcs_subparsers.add_parser("url-mode", help="Set the url mode to https or ssh")
-    url_parser.add_argument("url_mode", help="URL mode to set (https/ssh).", choices=["https","ssh"],default=None)
+    url_parser.add_argument("url_mode", help="URL mode to set (https/ssh).", choices=["https","ssh"],default=None,nargs="?")
 
     pull_parser = cmd_vcs_subparsers.add_parser("pull", help="Pull the repositories")
-    pull_parser.add_argument("version", help="Version to pull",default=None)
+    pull_parser.add_argument("version", help="Version to pull",default=None,nargs="?")
 
     version_parser = cmd_vcs_subparsers.add_parser("version", help="Set/Get the version of the repositories")
-    version_parser.add_argument("version", help="Version to set (empty if get)",default=None)
+    version_parser.add_argument("version", help="Version to set (empty if get)",default=None,nargs="?")
 
     argcomplete.autocomplete(parser)
     return parser
@@ -119,5 +119,18 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
         init_setup(args)
     elif args.app == "clear":
         clear_setup(args)
+    elif args.app == "vcs":
+        if args.vcs == "url-mode":
+            url_mode(args)
+        elif args.vcs == "pull":
+            version = pull_repos_vcs(args)
+            if version:
+                print("Pulled to Version :",version )
+        elif args.vcs == "version":
+            version = repos_vcs_version(args)
+            if version:
+                print("Current Version :", version)
+        else:
+            parser.print_help()
     else:
         parser.print_help()
