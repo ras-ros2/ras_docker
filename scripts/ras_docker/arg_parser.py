@@ -31,6 +31,7 @@ def get_parser(test_func_en = False):
 
         nested_init_parser = nested_subparsers.add_parser("init", help="Initialize the application")
         nested_init_parser.add_argument("--image-pull","-i", action="store_true",default=False,dest="image_pull", help="Force pull the image from the docker repo")
+        # nested_init_parser.add_argument("--dockerhub","-d",action="store_true",default=False)
 
         nested_build_parser = nested_subparsers.add_parser("build", help="Build the robot image")
         nested_build_parser.add_argument("--force", action="store_true", help="Force rebuild of the image")

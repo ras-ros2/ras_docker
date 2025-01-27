@@ -49,8 +49,9 @@ def get_setup_vcs_mapping():
     for _app_name in supported_apps:
         app_vcs_map = main_vcs.add_child(_app_name,VcsMap(vcs_repos_path/"apps"/f"ras_{_app_name}_app"/"main.repos",\
                                                           "apps",default_pull=False))
-        app_vcs : VCS = next(iter(app_vcs_map.vcs_map.values()))
-        app_vcs.add_child("deps",VcsMap(vcs_repos_path/"apps"/f"ras_{_app_name}_app"/"deps.repos",".",default_pull=True))
+        app_vcs_map.vcs_map[f"ras_{_app_name}_app"].add_child("deps",VcsMap(vcs_repos_path/"apps"/f"ras_{_app_name}_app"/"deps.repos",".",default_pull=True))
+
+
     return main_vcs
 
 
@@ -242,7 +243,7 @@ class VCS(object):
     def add_child(self,label:str,vcs_map:'VcsMap'):
         # vcs_map.parent = self
         self.children[label] = VcsMap(vcs_map.file_path,vcs_map.work_dir,default_pull=vcs_map.default_pull,parent=self)
-        return vcs_map
+        return self.children[label]
 
 @dataclass
 class VcsMap:
