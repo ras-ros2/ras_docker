@@ -487,7 +487,6 @@ def repos_vcs_version(args: argparse.Namespace):
     return repos_vcs.get_current_version()
 
 def init_app_setup(args: argparse.Namespace):
-    init_setup(args)
     main_vcs = get_setup_vcs_mapping()
     main_vcs.update_vcs_from_repo()
     main_vcs.children[args.app].init_vcs(from_repo=False)
