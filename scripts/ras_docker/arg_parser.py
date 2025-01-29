@@ -22,12 +22,16 @@ Email: info@opensciencestack.org
 
 import argcomplete, argparse
 from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits
+from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode
+supported_apps = ["robot","server"]
+
 def get_parser(test_func_en = False):
     def add_nested_subparsers(subparser: argparse.ArgumentParser):
-        nested_subparsers = subparser.add_subparsers(dest="command", help="Command to execute")
+        nested_subparsers = subparser.add_subparsers(title="app",dest="command", help="Command to execute")
 
         nested_init_parser = nested_subparsers.add_parser("init", help="Initialize the application")
         nested_init_parser.add_argument("--image-pull","-i", action="store_true",default=False,dest="image_pull", help="Force pull the image from the docker repo")
+        # nested_init_parser.add_argument("--dockerhub","-d",action="store_true",default=False)
 
         nested_build_parser = nested_subparsers.add_parser("build", help="Build the robot image")
         nested_build_parser.add_argument("--force", action="store_true", help="Force rebuild of the image")
@@ -48,15 +52,39 @@ def get_parser(test_func_en = False):
             nested_test_parser = nested_subparsers.add_parser("test", help="Run a test in the container")
 
         return nested_subparsers
-        
-    parser = argparse.ArgumentParser(description="RAS Docker Interface.\nBuild and run RAS applications")
-    subparsers = parser.add_subparsers(dest="app", help="Application to run/build")
 
-    real_parser = subparsers.add_parser("robot", help="robot robot application")
-    nested_real_parsers = add_nested_subparsers(real_parser)
+    parser = argparse.ArgumentParser(description="RAS Application Interface.\nBuild and run RAS applications")
+    app_subparsers = parser.add_subparsers(dest="app", help="Application to run/build")
 
-    sim_parser = subparsers.add_parser("server", help="Simulation application")
-    nested_sim_parsers = add_nested_subparsers(sim_parser)
+    def add_app_subparsers(app_subparsers : argparse._SubParsersAction ):
+        for app_name in supported_apps:
+            app_parser = app_subparsers.add_parser(app_name, help=f"{app_name} application")
+            nested_app_parsers = add_nested_subparsers(app_parser)
+        return app_subparsers
+    
+    
+    app_subparsers = add_app_subparsers(app_subparsers)
+    
+    # cmd_subparsers = parser.add_subparsers(dest="command", help="Command to execute")
+
+    app_parser : argparse.ArgumentParser = app_subparsers.add_parser("app", help="Application commands")
+    cmd_app_subparsers = app_parser.add_subparsers(title="app",dest="app", help="Application to run/build")
+    cmd_app_subparsers = add_app_subparsers(cmd_app_subparsers)
+
+    setup_parser : argparse.ArgumentParser = app_subparsers.add_parser("init", help="Initialize the RAS setup")
+    clear_parser : argparse.ArgumentParser = app_subparsers.add_parser("clear", help="Clear the RAS setup")
+
+    vcs_parser : argparse.ArgumentParser = app_subparsers.add_parser("vcs", help="VCS commands")
+    cmd_vcs_subparsers = vcs_parser.add_subparsers(title="vcs",dest="vcs", help="VCS commands")
+
+    url_parser = cmd_vcs_subparsers.add_parser("url-mode", help="Set the url mode to https or ssh")
+    url_parser.add_argument("url_mode", help="URL mode to set (https/ssh).", choices=["https","ssh"],default=None,nargs="?")
+
+    pull_parser = cmd_vcs_subparsers.add_parser("pull", help="Pull the repositories")
+    pull_parser.add_argument("version", help="Version to pull",default=None,nargs="?")
+
+    version_parser = cmd_vcs_subparsers.add_parser("version", help="Set/Get the version of the repositories")
+    version_parser.add_argument("version", help="Version to set (empty if get)",default=None,nargs="?")
 
     argcomplete.autocomplete(parser)
     return parser
@@ -66,25 +94,44 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
     if (not hasattr(args, "app")) or isinstance(args.app, type(None)):
         parser.print_help()
         exit(1)
+    if (args.app == "app") or (args.app in supported_apps):
+        if args.command == "build":
+            build_image_app(args)
+        elif args.command == "run":
+            run_image_app(args)
+        elif args.command == "init":
+            init_app(args)
+        elif args.command == "dev":
+            if hasattr(args,"commit") and args.commit:
+                run_image_commits(args)
+            elif hasattr(args,"terminator") and args.terminator:
+                run_image_command(args, "/bin/bash -c terminator")
+            else:
+                run_image_command(args, "/bin/bash")
         
-    elif args.command == "build":
-        build_image_app(args)
-    elif args.command == "run":
-        run_image_app(args)
-    elif args.command == "init":
-        init_app(args)
-    elif args.command == "dev":
-        if hasattr(args,"commit") and args.commit:
-            run_image_commits(args)
-        elif hasattr(args,"terminator") and args.terminator:
-            run_image_command(args, "/bin/bash -c terminator")
+        elif args.command == "test":
+            if callable(test_func):
+                test_func(args)
+            else:
+                raise ValueError(f"Invalid Test Function {test_func}")
         else:
-            run_image_command(args, "/bin/bash")
-    
-    elif args.command == "test":
-        if callable(test_func):
-            test_func(args)
+            parser.print_help()
+    elif args.app == "init":
+        init_setup(args)
+    elif args.app == "clear":
+        clear_setup(args)
+    elif args.app == "vcs":
+        if args.vcs == "url-mode":
+            url_mode(args)
+        elif args.vcs == "pull":
+            version = pull_repos_vcs(args)
+            if version:
+                print("Pulled to Version :",version )
+        elif args.vcs == "version":
+            version = repos_vcs_version(args)
+            if version:
+                print("Current Version :", version)
         else:
-            raise ValueError(f"Invalid Test Function {test_func}")
+            parser.print_help()
     else:
         parser.print_help()

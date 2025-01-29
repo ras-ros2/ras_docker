@@ -25,6 +25,8 @@ import ras_docker
 import subprocess
 from functools import partial
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import partial
 
 WORKING_PATH = Path(os.environ["RAS_DOCKER_PATH"])
 ROS2_PKGS_PATH = WORKING_PATH/"ros2_pkgs"
@@ -43,6 +45,29 @@ class DockerCmdType(Enum):
     FULL = 1
     RAW = 2
     ATTACH = 3
+
+import re
+from string import Formatter
+
+def parse_with_format(format_string, input_string):
+    formatter = Formatter()
+    pattern = "^"
+    field_names = []
+
+    for literal_text, field_name, format_spec, conversion in formatter.parse(format_string):
+        if literal_text:
+            pattern += re.escape(literal_text)
+        if field_name:
+            field_names.append(field_name)
+            pattern += r"(?P<" + field_name + r">[^/]+)"
+
+    pattern += "$"
+
+    match = re.match(pattern, input_string)
+    if not match:
+        raise ValueError(f"Input string does not match the format: {input_string}")
+
+    return match.groupdict()
 
 def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     docker_cmd_fmt_prefix = """docker run -it \
@@ -103,12 +128,28 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
 def prepend_root_command(command_str:str):
     return f"sudo -E bash -c '{command_str}'"
 
-def run_command_shell(command_str:str,as_root:bool=False,work_dir:Path=None):
+def run_command_shell(command_str:str,as_root:bool=False,work_dir:Path=None,read_output=False,preview=True):
     if isinstance(work_dir,Path):
         work_dir = str(work_dir)
     if as_root:
         command_str = prepend_root_command(command_str)
-    return subprocess.run(command_str,shell=True,cwd=work_dir,executable="/bin/bash")
+    if preview:
+        print("Running Command:",command_str)
+    return subprocess.run(command_str,shell=True,cwd=work_dir,executable="/bin/bash",\
+                          capture_output=read_output)
+
+def run_functions_in_threads(functions_with_args):
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(partial(func, *args, **kwargs)) for func, args, kwargs in functions_with_args]
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                raise RuntimeError(f"Function execution failed: {e}")
+
+def run_command_list_in_threads(commands:list,as_root=False,work_dir:Path=None):
+    function_list = [(_cmd,None,{"as_root":as_root,"work_dir":work_dir}) for _cmd in commands]
+    return run_functions_in_threads(function_list)
 
 def get_display_var():
     return os.environ['DISPLAY']
