@@ -483,7 +483,7 @@ def repos_vcs_version(args: argparse.Namespace):
     repos_vcs.pull_repo()
     if args.version:
         repos_vcs.switch_version(args.version)
-        return args.version
+        # return args.version
     print(repos_vcs.get_branches_and_versions())
     main_vcs = get_setup_vcs_mapping()
     main_vcs.init_repo(from_repo=False)
