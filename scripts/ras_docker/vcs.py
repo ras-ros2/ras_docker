@@ -163,17 +163,17 @@ class VCS(object):
     
     def import_repo(self):
         if self.type == "git":
-            ret = run_command_shell(f"git clone --recursive {self.reformed_url} {self.repo_path}")
+            ret = run_command_shell(f"git clone --recursive {self.reformed_url} -b {self.version} {self.repo_path}")
             if ret.returncode != 0:
                 return False
-            ret = run_command_shell(f"git -C {self.repo_path} checkout {self.version}")
+            ret = run_command_shell(f"git -C {self.repo_path} checkout --recurse-submodules {self.version}")
             return ret.returncode == 0
         return False
     
     def pull_repo(self,switch_version=False):
         if self.type == "git":
             if switch_version:
-                ret = run_command_shell(f"git -C {self.repo_path} checkout {self.version}")
+                ret = run_command_shell(f"git -C {self.repo_path} checkout --recurse-submodules {self.version}")
                 if ret.returncode != 0:
                     return False
             ret = run_command_shell(f"git -C {self.repo_path} pull")
@@ -203,7 +203,7 @@ class VCS(object):
 
     def switch_version(self,version:str):
         if self.type == "git":
-            ret = run_command_shell(f"git -C {self.repo_path} checkout {version}")
+            ret = run_command_shell(f"git -C {self.repo_path} checkout --recurse-submodules {version}")
             return ret.returncode == 0
         return False
     
