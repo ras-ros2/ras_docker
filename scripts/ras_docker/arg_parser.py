@@ -89,6 +89,7 @@ def get_parser(test_func_en = False):
     version_parser.add_argument("version", help="Version to set (empty if get)",default=None,nargs="?")
     
     status_parser = cmd_vcs_subparsers.add_parser("status", help="Get the status of the repositories")
+    status_parser.add_argument("--fetch","-f", action="store_true", help="Fetch the repositories")
 
     argcomplete.autocomplete(parser)
     return parser

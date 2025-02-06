@@ -129,8 +129,13 @@ class VCS(object):
         else:
             raise Exception("Unsupported VCS type")
         
-    def print_status(self,children=False):
+    def print_status(self,fetch=False,children=False):
         if self.is_repo_path_valid():
+            if fetch:
+                try:
+                    run_command_shell(f"git -C {self.repo_path} fetch")
+                except:
+                    pass
             run_command_shell(f"git -C {self.repo_path} status")
         else:
             if self.repo_path.exists():
@@ -139,7 +144,7 @@ class VCS(object):
                 print(f"{self.repo_path} is not set up. ")
         if children:
             for _child in self.iterate_children(log=True):
-                _child.print_status(children=children)
+                _child.print_status(fetch=fetch,children=children)
     
     def update_repo_from_vcs(self):
         if self.type == "git":
@@ -312,9 +317,9 @@ class VcsMap:
         ret = run_command_shell(f"vcs pull {' '.join(repos)}", work_dir=self.work_dir)
         return ret.returncode == 0
     
-    def print_status(self,children=False):
+    def print_status(self,fetch=False,children=False):
         for _v in self.iterate_vcs(log=True):
-            _v.print_status(children=children)
+            _v.print_status(fetch=fetch,children=children)
             
     def init_vcs(self,from_repo=False):
         function_list = []
@@ -331,7 +336,7 @@ class VcsMap:
     def iterate_vcs(self,log=False):
         for _v in self.vcs_map.values():
             if log:
-                print(f"currently on {_v.path}")
+                print(f"working on {_v.repo_path}")
             yield _v
 
 
@@ -525,7 +530,10 @@ def init_app_setup(args: argparse.Namespace):
 def get_vcs_status(args: argparse.Namespace):
     main_vcs = get_setup_vcs_mapping()
     main_vcs.update_vcs_from_repo()
-    main_vcs.print_status(children=True)
+    fetch_vcs=False
+    if hasattr(args,"fetch") and args.fetch:
+        fetch_vcs=True
+    main_vcs.print_status(fetch=fetch_vcs,children=True)
 
 def clear_setup(args: argparse.Namespace):
     main_vcs = get_setup_vcs_mapping()
