@@ -21,8 +21,8 @@ Email: info@opensciencestack.org
 # PYTHON_ARGCOMPLETE_OK
 
 import argcomplete, argparse
-from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits
-from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode
+from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits,kill_app
+from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode,get_vcs_status
 supported_apps = ["robot","server"]
 
 def get_parser(test_func_en = False):
@@ -40,7 +40,9 @@ def get_parser(test_func_en = False):
 
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the robot robot image")
         nested_run_parser.add_argument("args", nargs=argparse.REMAINDER, help="Arguments to pass to the run command")
-
+        
+        nested_kill_parser = nested_subparsers.add_parser("kill", help="Kill the robot image")
+        
         nested_dev_parser = nested_subparsers.add_parser("dev", help="Open terminal in Container")
         nested_dev_parser.add_argument("--root","-r", action="store_true", help="Open terminal as root user")
         nested_dev_parser.add_argument("--commit","-c", action="store_true", help="Commit changes to the image")
@@ -85,6 +87,8 @@ def get_parser(test_func_en = False):
 
     version_parser = cmd_vcs_subparsers.add_parser("version", help="Set/Get the version of the repositories")
     version_parser.add_argument("version", help="Version to set (empty if get)",default=None,nargs="?")
+    
+    status_parser = cmd_vcs_subparsers.add_parser("status", help="Get the status of the repositories")
 
     argcomplete.autocomplete(parser)
     return parser
@@ -99,6 +103,8 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
             build_image_app(args)
         elif args.command == "run":
             run_image_app(args)
+        elif args.command == "kill":
+            kill_app(args)
         elif args.command == "init":
             init_app(args)
         elif args.command == "dev":
@@ -108,7 +114,7 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
                 run_image_command(args, "/bin/bash -c terminator")
             else:
                 run_image_command(args, "/bin/bash")
-        
+
         elif args.command == "test":
             if callable(test_func):
                 test_func(args)
@@ -131,6 +137,8 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
             version = repos_vcs_version(args)
             if version:
                 print("Current Version :", version)
+        elif args.vcs == "status":
+            get_vcs_status(args)
         else:
             parser.print_help()
     else:

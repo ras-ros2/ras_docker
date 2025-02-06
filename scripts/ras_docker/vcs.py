@@ -128,6 +128,18 @@ class VCS(object):
             self.version = get_repo_version(repo_path)
         else:
             raise Exception("Unsupported VCS type")
+        
+    def print_status(self,children=False):
+        if self.is_repo_path_valid():
+            run_command_shell(f"git -C {self.repo_path} status")
+        else:
+            if self.repo_path.exists():
+                print(f"{self.repo_path} is corrupted! Cannot get status")
+            else:
+                print(f"{self.repo_path} is not set up. ")
+        if children:
+            for _child in self.iterate_children(log=True):
+                _child.print_status(children=children)
     
     def update_repo_from_vcs(self):
         if self.type == "git":
@@ -136,6 +148,12 @@ class VCS(object):
             run_command_shell(f"git -C {repo_path} checkout {self.version}")
         else:
             raise Exception("Unsupported VCS type")
+    
+    def iterate_children(self,log=False):
+        for _child in self.children.values():
+            if log:
+                print(f"currently on {_child.work_dir}")
+            yield _child
         
     def switch_url(self,git_type:GitUrlType=None,write=False):
         # print(f"switch url {self.repo_path}")
@@ -144,7 +162,7 @@ class VCS(object):
             if not self.is_repo_path_valid():
                 raise ValueError(f"Repo path {self.repo_path} is invalid")
             subprocess.run(f"git -C {self.repo_path} remote set-url origin {self.url}",shell=True,check=True)
-        for _child in self.children.values():
+        for _child in self.iterate_children(log=False):
             _child.switch_git_type(git_type,write)
 
     def is_repo_path_valid(self):
@@ -192,13 +210,13 @@ class VCS(object):
             self.pull_repo()
         else:
             self.import_repo()
-        for _v in self.children.values():
+        for _v in self.iterate_children(log=True):
             if _v.default_pull:
                 _v.init_vcs(from_repo=from_repo)
             
     
     def clear_child_repos(self):
-        for _v in self.children.values():
+        for _v in self.iterate_children(log=True):
             _v.clear_vcs()
 
     def switch_version(self,version:str):
@@ -256,14 +274,14 @@ class VcsMap:
     def __post_init__(self):
         if isinstance(self.vcs_map,type(None)):
             self.vcs_map = parse_vcs_file(self.file_path,Path(self.work_dir))
-        for _v in self.vcs_map.values():
+        for _v in self.iterate_vcs(log=False):
             _v.parent = self.parent
 
     def write(self):
         write_vcs_file(self.file_path,self.vcs_map)
 
     def switch_git_type(self,git_type:GitUrlType=None,write=False):
-        for _v in self.vcs_map.values():
+        for _v in self.iterate_vcs(log=False):
             if _v.repo_path.exists():
                 _v.switch_url(git_type,write)
             else:
@@ -285,26 +303,36 @@ class VcsMap:
         # ret = run_command_shell(f"vcs import --recursive < {self.file_path}", work_dir=self.work_dir)
         # return ret.returncode == 0
         function_list = []
-        for _v in self.vcs_map.values():
+        for _v in self.iterate_vcs(log=True):
             function_list.append((_v.import_repo,[],{}))
         return run_functions_in_threads(function_list)
 
     def pull_vcs(self):
-        repos = [ _v.repo_path for _v in self.vcs_map.values()]
+        repos = [ _v.repo_path for _v in self.iterate_vcs(log=True)]
         ret = run_command_shell(f"vcs pull {' '.join(repos)}", work_dir=self.work_dir)
         return ret.returncode == 0
     
+    def print_status(self,children=False):
+        for _v in self.iterate_vcs(log=True):
+            _v.print_status(children=children)
+            
     def init_vcs(self,from_repo=False):
         function_list = []
-        for _v in self.vcs_map.values():
+        for _v in self.iterate_vcs():
             function_list.append((_v.init_repo,[],{"from_repo":from_repo}))
         return run_functions_in_threads(function_list)
 
     def clear_vcs(self):
         function_list = []
-        for _v in self.vcs_map.values():
+        for _v in self.iterate_vcs():
             function_list.append((_v.clear_repo,[],{}))
         return run_functions_in_threads(function_list)
+    
+    def iterate_vcs(self,log=False):
+        for _v in self.vcs_map.values():
+            if log:
+                print(f"currently on {_v.path}")
+            yield _v
 
 
 def parse_vcs_file(vcs_file:Path,parent_path:Path=None):
@@ -494,6 +522,11 @@ def init_app_setup(args: argparse.Namespace):
     main_vcs.update_vcs_from_repo()
     main_vcs.children[args.app].init_vcs(from_repo=False)
 
+def get_vcs_status(args: argparse.Namespace):
+    main_vcs = get_setup_vcs_mapping()
+    main_vcs.update_vcs_from_repo()
+    main_vcs.print_status(children=True)
+
 def clear_setup(args: argparse.Namespace):
     main_vcs = get_setup_vcs_mapping()
     main_vcs.clear_child_repos()
@@ -509,6 +542,8 @@ def url_mode(args: argparse.Namespace):
         else:
             print(f"Invalid url_mode {url_mode}")
     print(f"Current url-mode: {VcsRemote.url_mode.name.lower()}")
+    
+
 
 
 def test():

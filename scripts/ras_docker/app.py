@@ -23,7 +23,7 @@ from .arg_parser import argparse
 from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType
 from .vcs import init_setup,init_app_setup
 from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDockerConf,\
-        docker_check_image_exists,run_image_command_core,DOCKERHUB_REPO
+        docker_check_image_exists,run_image_command_core,DOCKERHUB_REPO,kill_docker_container
 from dataclasses import dataclass, field, InitVar
 
 def init_app(args: argparse.Namespace):
@@ -165,3 +165,8 @@ def run_image_app(args : argparse.Namespace ):
     app_name = f"ras_{args.app}_app"
     bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app " + " ".join(args.args)
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
+
+
+def kill_app(args : argparse.Namespace):
+    app_conf = AppCoreConf(args.app)
+    kill_docker_container(app_conf.container_name)

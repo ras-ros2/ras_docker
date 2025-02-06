@@ -100,3 +100,11 @@ def run_image_command_core(docker_command_fmt,command_str,as_root=False):
     ret = subprocess.run(docker_cmd,shell=True)
     return ret.returncode==0
 
+def kill_docker_container(container_name):
+    if check_container_already_running(container_name):
+        print(f"Killing Container: {container_name}")
+        subprocess.run(f"docker kill {container_name}",shell=True)
+    else:
+        print(f"Container {container_name} is not running")
+    return
+
