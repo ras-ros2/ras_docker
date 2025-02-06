@@ -77,6 +77,8 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
                 --name {container_name} \
                 --workdir {work_dir} \
                 --network host """
+    passthrough_mounts = ["/tmp/.X11-unix","/mnt/wslg"]
+    passthrough_envvars = ["WAYLAND_DISPLAY","XDG_RUNTIME_DIR"]
     docker_gen_cmd_opts = """ -v {app_dir}:/{container_name}/ \
                             {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
                                 {gpu_arg} \
@@ -84,6 +86,13 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     docker_cmd_fmt_suffix= """ {image_name} \
                 {command} """
     docker_cmd_fmt = None
+    for _dir in passthrough_mounts:
+        _path = Path(_dir).absolute().resolve()
+        if _path.is_dir():
+            docker_gen_cmd_opts += f" -v {_path}:{_path} "
+    for _env in passthrough_envvars:
+        if _env in os.environ.keys():
+            docker_gen_cmd_opts += f" -e {_env} "
     if (cmd_type == DockerCmdType.RAW):
         docker_cmd_fmt = (docker_cmd_fmt_prefix + docker_cmd_fmt_suffix).format
     elif (cmd_type == DockerCmdType.FULL):
