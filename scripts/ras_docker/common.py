@@ -69,6 +69,9 @@ def parse_with_format(format_string, input_string):
 
     return match.groupdict()
 
+def is_wsl():
+    return Path("/proc/sys/fs/binfmt_misc/WSLInterop").exists()
+
 def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     docker_cmd_fmt_prefix = """docker run -it \
                 -e DISPLAY={display_env} \

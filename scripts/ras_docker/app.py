@@ -20,7 +20,7 @@ Email: info@opensciencestack.org
 """
 
 from .arg_parser import argparse
-from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType
+from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType,is_wsl
 from .vcs import init_setup,init_app_setup
 from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDockerConf,\
         docker_check_image_exists,run_image_command_core,DOCKERHUB_REPO,kill_docker_container
@@ -145,8 +145,20 @@ def run_image_command(args : argparse.Namespace, command_str):
         container_conf_path.mkdir(parents=True,exist_ok=True)
         dev_container_path = WORKING_PATH/'.devcontainer'/container_name
         extra_docker_args = f" -v {dev_container_path}/.vscode:/home/ras/.vscode-server "
-        vscode_cmd = f" cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}%3a{TAG_SUFFIX}.json && code {dev_container_path}/{container_name}.code-workspace"
-        subprocess.run(vscode_cmd,shell=True)
+        pre_vscode_cmd = f"cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}.json"
+        subprocess.run(pre_vscode_cmd,shell=True)
+        vscode_ws = f"{dev_container_path}/{container_name}"
+        code_cmd = f"code"
+        if is_wsl():
+            # vscode_ws += "_wsl"
+            code_cmd = "/mnt/c/Program Files/Microsoft VS Code/Code.exe"
+            if not Path(code_cmd).exists():
+                print("Unwxpected vscode setup")
+            code_cmd = f"\"{code_cmd}\""
+            subprocess.run(f"{code_cmd} {vscode_ws}.code-workspace",shell=True,start_new_session=True)
+        else:
+            vscode_cmd = f"{code_cmd} {vscode_ws}.code-workspace"
+            subprocess.run(vscode_cmd,shell=True)
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,get_docker_cmd_fmt(DockerCmdType.FULL),extra_docker_args=extra_docker_args)
     return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=as_root)
 
