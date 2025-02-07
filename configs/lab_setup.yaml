@@ -12,8 +12,9 @@ lab_setup:
           yaw: -1.57
       home_joint_state:
           joint1: 0
-          joint2: 0
-          joint3: 0
-          joint4: 0.57
+          joint2: 0.17
+          joint3: 0.56
+          joint4: 0
           joint5: 0
-          joint6: 0.55
+          joint6: 0.38
+
