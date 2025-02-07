@@ -155,7 +155,7 @@ def run_image_command(args : argparse.Namespace, command_str):
             if not Path(code_cmd).exists():
                 print("Unwxpected vscode setup")
             code_cmd = f"\"{code_cmd}\""
-            subprocess.run(f"{code_cmd} {vscode_ws}.code-workspace",shell=True,start_new_session=True)
+            subprocess.run(f"{code_cmd} {vscode_ws}.code-workspace &",shell=True)
         else:
             vscode_cmd = f"{code_cmd} {vscode_ws}.code-workspace"
             subprocess.run(vscode_cmd,shell=True)

@@ -56,7 +56,8 @@
 		"files.associations": {
 			"chrono": "cpp",
 			"typeindex": "cpp",
-			"typeinfo": "cpp"
+			"typeinfo": "cpp",
+			"string_view": "cpp"
 		}
 	}
 }
