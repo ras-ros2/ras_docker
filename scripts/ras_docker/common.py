@@ -85,7 +85,8 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     docker_gen_cmd_opts = """ -v {app_dir}:/{container_name}/ \
                             {extra_docker_args} -v /var/run/docker.sock:/var/run/docker.sock \
                                 {gpu_arg} \
-                                -v /dev/input:/dev/input --device-cgroup-rule='c 13:* rmw' """ + f" -v {ROS2_PKGS_PATH}:/{{container_name}}/ros2_ws/src/common_pkgs "
+                                 -v /dev:/dev --device-cgroup-rule='c 13:* rmw' --device-cgroup-rule 'c 81:* rmw' \
+                            --device-cgroup-rule 'c 189:* rmw' """ + f" -v {ROS2_PKGS_PATH}:/{{container_name}}/ros2_ws/src/common_pkgs "
     docker_cmd_fmt_suffix= """ {image_name} \
                 {command} """
     docker_cmd_fmt = None
