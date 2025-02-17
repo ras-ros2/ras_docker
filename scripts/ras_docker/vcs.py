@@ -35,7 +35,7 @@ supported_assets = ["manipulator"]
 supported_apps = ["robot","server"]
 
 def get_repos_vcs():
-    return VCS(vcs_repos_path,repos_url,"reorg")
+    return VCS(vcs_repos_path,repos_url,"dev")
 
 def get_setup_vcs_mapping():
     if not vcs_repos_path.exists():
@@ -205,6 +205,7 @@ class VCS(object):
     
     def init_repo(self,from_repo=False):
         # print(self.repo_path,from_repo)
+        self_init_status  = False
         if self.repo_path.exists():
             if not self.is_repo_path_valid():
                 raise Exception(f"Invalid repo path {self.repo_path}")
@@ -212,12 +213,14 @@ class VCS(object):
                 self.update_vcs_from_repo()
             else:
                 self.update_repo_from_vcs()
-            self.pull_repo()
+            self_init_status = self.pull_repo()
         else:
-            self.import_repo()
-        for _v in self.iterate_children(log=True):
-            if _v.default_pull:
-                _v.init_vcs(from_repo=from_repo)
+            self_init_status = self.import_repo()
+        if self_init_status:
+            for _v in self.iterate_children(log=True):
+                if _v.default_pull:
+                    _v.init_vcs(from_repo=from_repo)
+            
             
     
     def clear_child_repos(self):
