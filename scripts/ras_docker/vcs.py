@@ -205,7 +205,7 @@ class VCS(object):
     
     def init_repo(self,from_repo=False):
         # print(self.repo_path,from_repo)
-        self_init_status  = False
+        self_init_status  = True
         if self.repo_path.exists():
             if not self.is_repo_path_valid():
                 raise Exception(f"Invalid repo path {self.repo_path}")
@@ -220,7 +220,7 @@ class VCS(object):
             for _v in self.iterate_children(log=True):
                 if _v.default_pull:
                     _v.init_vcs(from_repo=from_repo)
-            
+        return self_init_status
             
     
     def clear_child_repos(self):
@@ -328,7 +328,15 @@ class VcsMap:
         function_list = []
         for _v in self.iterate_vcs():
             function_list.append((_v.init_repo,[],{"from_repo":from_repo}))
-        return run_functions_in_threads(function_list)
+        try:
+            run_functions_in_threads(function_list)
+        except Exception as e:
+            print(f"Error in init_vcs: {e}")
+            return False
+        for _v in self.iterate_vcs():
+            if not _v.is_repo_path_valid():
+                return False
+        return True
 
     def clear_vcs(self):
         function_list = []
@@ -500,10 +508,16 @@ def vcs_fetch_repos(repos_file:Path,target_path:Path,pull=False):
 
 
 def init_setup(args: argparse.Namespace):
+    status = True
     repos_vcs = get_repos_vcs()
-    repos_vcs.init_repo(from_repo=True)
+    status = repos_vcs.init_repo(from_repo=True)
+    if not status:
+        return False
     main_vcs = get_setup_vcs_mapping()
-    main_vcs.init_repo(from_repo=False)
+    status = main_vcs.init_repo(from_repo=False)
+    if not status:
+        return False
+    return True
 
 def pull_repos_vcs(args: argparse.Namespace):
     repos_vcs = get_repos_vcs()
@@ -516,19 +530,20 @@ def pull_repos_vcs(args: argparse.Namespace):
 def repos_vcs_version(args: argparse.Namespace):
     repos_vcs = get_repos_vcs()
     repos_vcs.update_vcs_from_repo()
-    repos_vcs.pull_repo()
     if args.version:
+        repos_vcs.pull_repo()
         repos_vcs.switch_version(args.version)
+        main_vcs = get_setup_vcs_mapping()
+        main_vcs.init_repo(from_repo=False)
         # return args.version
     print(repos_vcs.get_branches_and_versions())
-    main_vcs = get_setup_vcs_mapping()
-    main_vcs.init_repo(from_repo=False)
+    
     return repos_vcs.get_current_version()
 
 def init_app_setup(args: argparse.Namespace):
     main_vcs = get_setup_vcs_mapping()
     main_vcs.update_vcs_from_repo()
-    main_vcs.children[args.app].init_vcs(from_repo=False)
+    return main_vcs.children[args.app].init_vcs(from_repo=False)
 
 def get_vcs_status(args: argparse.Namespace):
     main_vcs = get_setup_vcs_mapping()

@@ -27,14 +27,16 @@ from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDocker
 from dataclasses import dataclass, field, InitVar
 
 def init_app(args: argparse.Namespace):
-    init_setup(args)
+    if not init_setup(args):
+        return
     apps_path = WORKING_PATH/'apps'
     apps_path.mkdir(parents=True,exist_ok=True)
     repos_path = WORKING_PATH/'repos'
     app_repos_path = repos_path/'apps'
     app_name = f"ras_{args.app}_app"
     app_path = apps_path/app_name
-    init_app_setup(args)
+    if not init_app_setup(args):
+        return
     # repos_file = app_repos_path/f"{app_name}.repos"
     # if not repos_file.exists():
     #     print(f"Error: {repos_file} does not exist")
@@ -73,8 +75,8 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
         exit(1)
     if remove_cn:
         extra_docker_args += " --rm "
-    # if app_conf.app_name == "ras_server_app":
-    extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    if app_conf.app_name == "ras_server_app":
+        extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
     docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
         display_env=f"{get_display_var()}",
         app_dir=str(app_path),
@@ -136,6 +138,9 @@ def run_image_command(args : argparse.Namespace, command_str):
     app_conf = AppCoreConf(args.app)
     extra_docker_args = ""
     as_root=(hasattr(args,"root") and args.root)
+    if not as_root:
+        dev_container_path = WORKING_PATH/'.devcontainer'/app_conf.container_name
+        extra_docker_args = f" -v {dev_container_path}/.vscode:/home/ras/.vscode-server "
     if hasattr(args,"vscode") and args.vscode:
         if as_root:
             print("Error: Cannot run vscode as root")
@@ -144,7 +149,6 @@ def run_image_command(args : argparse.Namespace, command_str):
         container_conf_path = Path.home()/f".config/Code/User/globalStorage/ms-vscode-remote.remote-containers/imageConfigs/"
         container_conf_path.mkdir(parents=True,exist_ok=True)
         dev_container_path = WORKING_PATH/'.devcontainer'/container_name
-        extra_docker_args = f" -v {dev_container_path}/.vscode:/home/ras/.vscode-server "
         pre_vscode_cmd = f"cp {dev_container_path}/image_config.json {container_conf_path}/{container_name}.json"
         subprocess.run(pre_vscode_cmd,shell=True)
         vscode_ws = f"{dev_container_path}/{container_name}"
