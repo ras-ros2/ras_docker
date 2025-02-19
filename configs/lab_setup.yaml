@@ -15,6 +15,6 @@ lab_setup:
           joint2: 0.17
           joint3: 0.56
           joint4: 0
-          joint5: 0
-          joint6: 0.38
+          joint5: 0.38
+          joint6: 0
 
