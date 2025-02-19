@@ -1,18 +1,18 @@
 Poses:
   out1: {x: 0.2, y: 0, z: 0.5, roll: 3.14, pitch: 0, yaw: 0}
   above1: {x: 0.417, y: 0.094, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in1: {x: 0.417, y: 0.094, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 0.417, y: 0.094, z: 0.185, roll: 3.14, pitch: 0, yaw: 0}
   # out2: {x: 0.2, y: 0, z: 0.5, roll: 3.14, pitch: 0, yaw: -1.575}
   above2: {x: 0.421, y: 0.010, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in2: {x: 0.421, y: 0.010, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  in2: {x: 0.421, y: 0.010, z: 0.185, roll: 3.14, pitch: 0, yaw: 0}
   above3: {x: 0.423, y: -0.066, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in3: {x: 0.423, y: -0.066, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  in3: {x: 0.423, y: -0.066, z: 0.185, roll: 3.14, pitch: 0, yaw: 0}
   above4: {x: 0.337, y: -0.076, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in4: {x: 0.337, y: -0.076, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  in4: {x: 0.337, y: -0.076, z: 0.185, roll: 3.14, pitch: 0, yaw: 0}
   above5: {x: 0.337, y: 0.01, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in5: {x: 0.337, y: 0.01, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  in5: {x: 0.337, y: 0.01, z: 0.185, roll: 3.14, pitch: 0, yaw: 0}
   on_stack1: {x: 0.337, y: 0.01, z: 0.300, roll: 3.14, pitch: 0, yaw: 0}
-  stack1: {x: 0.337, y: 0.01, z: 0.190, roll: 3.14, pitch: 0, yaw: 0}
+  stack1: {x: 0.337, y: 0.01, z: 0.210, roll: 3.14, pitch: 0, yaw: 0}
 
 targets:
   - move2pose: out1
