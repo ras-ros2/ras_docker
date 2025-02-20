@@ -1,7 +1,7 @@
 ras:
   transport:
     implementation: default
-    ftp:
+    file_server:
       server:
         ip: localhost
         port: 2121

@@ -12,7 +12,7 @@ Poses:
 
 Grids:
   grid0:
-    pose: {x: 0.425, y: 0.010, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+    pose: {x: 0.425, y: 0.010, z: 0.165, roll: 3.14, pitch: 0, yaw: 0}
     locations:
       x1y1: {x: 0.0, y: 0.08}
       x1y2: {x: 0.0, y: 0.0}
@@ -24,25 +24,55 @@ Grids:
 targets:
   - move2pose: out1
   - pick_location:
+      object: wooden_cube1
       grid: grid0
       location: x1y1
   - place_location:
+      object: wooden_cube1
       grid: grid0
       location: x2y3
   - pick_location:
+      object: wooden_cube1
       grid: grid0
       location: x2y1
   - place_location:
+      object: wooden_cube1
       grid: grid0
       location: x2y3
       level: 1
   - pick_location:
+      object: wooden_cube1
       grid: grid0
       location: x1y3
   - place_location:
+      object: wooden_cube1
       grid: grid0
       location: x2y3
       level: 2
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x1y1
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x1y2
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x1y3
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x2y1
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x2y2
+  # - pick_location:
+  #     object: wooden_cube1
+  #     grid: grid0
+  #     location: x2y3
   - move2pose: out1
 
 old_targets:
