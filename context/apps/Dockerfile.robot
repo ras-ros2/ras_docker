@@ -8,7 +8,7 @@ RUN apt-get install -y ignition-fortress
 
 RUN pip install awsiotsdk
 
-RUN mkdir -p /ras_real_lab
+RUN mkdir -p /ras_robot_app
 
 RUN apt update && apt install -y inetutils-ping
 RUN apt install wget unzip -y
@@ -24,6 +24,6 @@ RUN apt install software-properties-common -y && \
 
 RUN  apt install ros-humble-rclpy-message-converter -y 
 
-RUN echo "source /ras_real_lab/scripts/env.sh" >> /etc/bash.bashrc
+RUN echo "source /ras_robot_app/scripts/env.sh" >> /etc/bash.bashrc
 
 CMD ["sleep", "infinity"]

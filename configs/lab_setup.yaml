@@ -10,3 +10,11 @@ lab_setup:
           roll: 0.0
           pitch: 0.0
           yaw: -1.57
+      home_joint_state:
+          joint1: 0
+          joint2: 0.17
+          joint3: 0.56
+          joint4: 0
+          joint5: 0.38
+          joint6: 0
+

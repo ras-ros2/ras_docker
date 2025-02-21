@@ -1,5 +1,5 @@
 {
-    "image" : "ras_real_lab:ras_local",
+    "image": "ras_robot_app:ras_local",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -9,7 +9,6 @@
                 "ms-python.vscode-pylance",
                 // add your own extensions here (ai/copilot)
             ]
-                
         }
     }
 }

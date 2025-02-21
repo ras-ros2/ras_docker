@@ -1,15 +1,11 @@
 ras:
-  real:
-    # sim: true
-    # real: false
-    mode: real # sim or real
   transport:
     implementation: default
-    ftp:
-      sim:
+    file_server:
+      server:
         ip: localhost
         port: 2121
-      real:
+      robot:
         ip: localhost
         port: 2122
     mqtt:

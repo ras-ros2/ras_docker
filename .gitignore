@@ -1,6 +1,7 @@
-apps/*
-!apps/.keep
-assets/*
-!assets/.keep
-context/build/*
-!context/build/.keep
+/apps/
+/repos/
+/assets/
+/ros2_pkgs/
+/context/build/
+__pycache__/*
+*.py[cod]

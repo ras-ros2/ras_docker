@@ -1,5 +1,5 @@
 {
-	"workspaceFolder": "/ras_sim_lab/ros2_ws",
+	"workspaceFolder": "/ras_server_app/ros2_ws",
 	"extensions": [
 		"github.copilot",
 		"github.copilot-chat",

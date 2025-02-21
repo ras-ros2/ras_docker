@@ -1,0 +1,5 @@
+Objects:
+  wooden_cube1:
+    interaction_height: 0.0152
+    max_height: 0.0252
+    model: "wooden_cube"
