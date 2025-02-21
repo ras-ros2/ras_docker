@@ -220,6 +220,8 @@ class VCS(object):
             for _v in self.iterate_children(log=True):
                 if _v.default_pull:
                     _v.init_vcs(from_repo=from_repo)
+                elif _v.absoulte_work_dir.exists():
+                    _v.init_vcs(from_repo=from_repo)
         return self_init_status
             
     
@@ -287,6 +289,12 @@ class VcsMap:
 
     def write(self):
         write_vcs_file(self.file_path,self.vcs_map)
+    
+    @property
+    def absoulte_work_dir(self):
+        if isinstance(self.parent,VCS):
+            return Path(self.parent.repo_path)/self.work_dir
+        return self.work_dir
 
     def switch_git_type(self,git_type:GitUrlType=None,write=False):
         for _v in self.iterate_vcs(log=False):
