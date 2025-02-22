@@ -39,8 +39,8 @@ sudo apt install git
 git clone --recursive https://github.com/ras-ros2/ras_docker
 ```
 
-## RAS Docker Interface (RDI)
-RAS Docker includes a command-line utility called **RDI** (RAS Docker Interface), implemented in `docker_interface.py` under the `scripts` directory.
+## RAS Docker Interface (RAS)
+RAS Docker includes a command-line utility called **RDI** (RAS Docker Interface), implemented in `ras_docker` package under the `scripts` directory.
 
 ### 2. Source the Environment File
 ```bash
