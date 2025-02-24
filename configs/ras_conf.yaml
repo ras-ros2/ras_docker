@@ -2,12 +2,10 @@ ras:
   transport:
     implementation: default
     file_server:
-      server:
-        ip: localhost
-        port: 2121
-      robot:
-        ip: localhost
-        port: 2122
+      use_external: true
+      ip: localhost
+      port: 2122
     mqtt:
+      use_external: true
       ip: localhost
       port: 2383
