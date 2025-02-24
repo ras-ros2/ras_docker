@@ -2,8 +2,10 @@ ras:
   transport:
     implementation: default
     file_server:
+      use_external: false
       ip: localhost
       port: 2122
     mqtt:
+      use_external: false
       ip: localhost
       port: 2383
