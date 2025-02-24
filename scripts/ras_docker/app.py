@@ -86,7 +86,8 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
     allow_login = args.command in ["dev","run"]
     docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
     if isinstance(docker_cmd_fmt_new,type(None)):
-        raise ValueError("Invalid fmt, expected callable.")
+        print("Already Running")
+        exit(1)
     return docker_cmd_fmt_new
 
 
