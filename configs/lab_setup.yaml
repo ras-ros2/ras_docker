@@ -1,6 +1,7 @@
 lab_setup:
   lab_name: "oss_lab1"
-  real_sim: "aruco_world"
+#   real_sim: "aruco_world" # with perception (significantly slower)
+  real_sim: "oss_lab1" # without perception
   robot:
       name: "xarm_lite6"
       pose:
