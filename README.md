@@ -1,8 +1,33 @@
+# RAS Docker Walkthrough
+
+This document provides a comprehensive walkthrough of the RAS Docker environment structure and functionality. Use this guide to navigate the codebase and understand how to use the system.
+
+## Directory Structure
+```
+.
+├── apps                   # Contains application-specific code
+│   ├── ras_robot_app      # Robot controller application
+│   └── ras_server_app     # Server application for remote control and monitoring
+├── assets                 # Static assets (images, 3D models, etc.)
+├── configs                # Configuration files for the system
+│   ├── experiments        # Robot experiment definitions
+│   ├── lab_setup.yaml     # Laboratory environment configuration
+│   ├── objects.yaml       # Object definitions for manipulation
+│   └── ras_conf.yaml      # Main RAS system configuration
+├── context                # Docker context files
+├── repos                  # External repositories and dependencies
+├── ros2_pkgs              # ROS2 packages for robot control
+│   ├── ras_bt_framework   # Behavior Tree framework for task execution
+│   ├── ras_core_pkgs      # Core ROS2 packages for robot functionality
+│   └── ras_sim            # Simulation environment packages
+├── scripts                # Utility scripts for various tasks
+└── env.sh                 # Environment setup script
+```
+---
 # RAS Server Setup Guide
 
 This guide will help you set up and run the RAS Server Application step by step.
 
----
 ## Prerequisites
 Before starting, ensure your system has the following installed:
 
