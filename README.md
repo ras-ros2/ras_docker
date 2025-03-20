@@ -225,7 +225,7 @@ c. moveit_server.launch.py
 d. TrajectoryRecordsService.py
    Path: apps/ras_server_app/ros2_ws/install/ras_bt_framework/lib/ras_bt_framework/TrajectoryRecordsService.py
 ```
-![main_sess0 tab](images/main_ses0_tab.png)
+![main_sess0 tab](images/main_sess0_tab.png)
 
 2. website:
 ```bash
@@ -255,8 +255,9 @@ b. spawn_manager.py:
 ![debugging tab](images/debugging_tab.png)
 
 The Rviz and Ignition Gazebo will launch as shown in the below images:
-![Rviz](images/rviz.png)
-![Gazebo](images/gazebo.png)
+
+![Rviz](images/Rviz_server_app.png)
+![Gazebo](images/Gazebo.png)
 
 `Note:` If the robot model does not spawn correctly, then go to step 7 → configure the server-robot connection correctly and re-run the server app.
 
