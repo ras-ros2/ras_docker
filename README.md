@@ -213,6 +213,52 @@ Start the server inside a Docker container:
 ```bash
 ras server run
 ```
+tmux Tabs shows the following files execution after running the server app:
+1. main_sess0:
+```bash
+a. main.launch.py
+   Path: ras_docker repo → apps/ras_server_app/ros2_ws/src/ras_app_main/launch/main.launch.py
+b. executor.cpp
+   Path: ras_bt_framework repo → ras_bt_framework/src/executor.cpp
+c. moveit_server.launch.py
+   Path: ras_moveit repo → ras_moveit/launch/moveit_server.launch.py
+d. TrajectoryRecordsService.py
+   Path: apps/ras_server_app/ros2_ws/install/ras_bt_framework/lib/ras_bt_framework/TrajectoryRecordsService.py
+```
+![main_sess0 tab](images/main_ses0_tab.png)
+
+2. website:
+```bash
+a. rosbridge_websocket_launch.xml
+   Path: apps/ras_server_app/ros2_ws/install/rosbridge_server/share/rosbridge_server/launch/rosbridge_websocket_launch.xml
+b. ras_webapp
+c. server.launch.py
+   path: ras_transport repo→ras_transport/launch/server.launch.py
+```
+![website tab](images/website_tab.png)
+
+3. experiment:
+```bash
+a. experiment_service.py
+   path: ras_bt_framework repo → ras_bt_framework/scripts/experiment_service.py
+b. FakeGripperServer.py
+   path: ras_bt_framework repo → ras_bt_framework/scripts/FakeGripperServer.py
+```
+![experiment tab](images/experiment_tab.png)
+
+4. debugging:
+```bash
+a. spawn_model_node
+b. spawn_manager.py:
+   path: ras_sim repo→ras_sim/scripts/spawn_manager.py
+```
+![debugging tab](images/debugging_tab.png)
+
+The Rviz and Ignition Gazebo will launch as shown in the below images:
+![Rviz](images/rviz.png)
+![Gazebo](images/gazebo.png)
+
+`Note:` If the robot model does not spawn correctly, then go to step 7 → configure the server-robot connection correctly and re-run the server app.
 
 ---
 ## Step 9: Access the Server Container
@@ -236,6 +282,7 @@ ras_kill
 ---
 ## Done!
 Your server is now set up and running. If you face any issues:
+- Follow the troubleshooting steps provided.
 - Restart your system.
 - Check logs inside `ras_server_app`.
 - Verify Docker setup and network configurations.
