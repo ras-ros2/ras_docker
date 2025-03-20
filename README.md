@@ -288,6 +288,111 @@ Your server is now set up and running. If you face any issues:
 - Check logs inside `ras_server_app`.
 - Verify Docker setup and network configurations.
 
+# RAS Robot Setup Guide (for same system on which the server setup is done)
+
+This guide will help you set up and run the RAS Robot Application step by step.
+
+## Prerequisites
+
+8. **xarm Robotic Manipulator** (with Dedicated Desktop Setup)
+
+---
+## Step 1: Initialize the Robot
+Set up the robot application:
+```bash
+ras robot init
+```
+`Note:` If the internet is unstable, this command may build the image locally. Run the following command to force pull the image from DockerHub:
+```bash
+ras robot init -i
+```
+This creates the `ras_robot_app` folder inside the `apps` directory.
+
+---
+## Step 2: Build the Robot Application
+Build the robot application:
+```bash
+ras robot build
+```
+This command will build 
+- the necessary Docker image for the robot.
+- the ROS 2 workspace inside the ras_robot_app/ros2_ws directory.
+If the ROS 2 workspace is not built then run it again.
+
+`Note:` If you've downloaded new images or updated an existing one, make sure to clean the build before rebuilding:
+```bash
+ras robot build --clean
+```
+---
+## Step 3: Robot Hardware Connection
+Use an Ethernet cable to connect the robot and your PC.
+Default IP of xarm: `192.168.1.111`
+
+Set Manual Ethernet IP Address:
+1. Go to **Settings → Network → Ethernet → IPv4**
+2. Select **Manual** and enter:
+   - **IP Address**: `192.168.1.78` (or any IP in the xArm's subnet)
+   - **Subnet Mask**: `255.255.255.0`
+
+![IP_settings](images/ip_settings.png)
+
+Check connection:
+```bash
+ping 192.168.1.111
+```
+If packets are sent and received successfully, the connection is established.
+
+Access the uFactory Studio App:
+```
+http://192.168.1.111:18333
+```
+![UFactory_Studio](images/UFactory_Studio.png)
+
+This interface allows you to enable and control the robot.
+
+---
+## Step 4: Run the Robot
+```bash
+ras robot run
+```
+The Rviz will launch as shown in the below image:
+
+![Rviz](images/Rviz_robot_app.png)
+
+You can control the xarm using the **predefined state** in the **start state**, **goal state** in the Query block as shown in Rviz.
+The **orange arm** represents the **goal state** and **white arm** represents the **start state** and it includes different states which can be used to move the real arm using the **plan & execute** button.
+
+If the model does not spawn correctly:
+1. Go to **Step 7** and reconfigure the server-robot connection.
+2. Check the wired connection.
+3. Use **UFactory Studio GUI** to verify the connection.
+
+---
+## Step 5: Access the Robot Container
+To log into the running robot container:
+```bash
+ras robot dev
+```
+To exit:
+```bash
+exit
+```
+or press `Ctrl + D`.
+
+---
+## Step 6: Kill the Robot App
+To stop the robot app, use:
+```bash
+ras_kill
+```
+---
+## Done!
+Your robot is now set up and running. If you face any issues:
+- Follow the troubleshooting steps provided.
+- Restart your system.
+- Check logs inside `ras_robot_app`.
+- Verify Docker setup and network configurations.
+
 # RAS Robot Setup Guide
 
 This guide will help you set up and run the RAS Robot Application step by step.
@@ -542,7 +647,7 @@ b. moveit_real_server.launch.py
 c. TrajectoryRecordsService.py
    path: apps/ras_robot_app/ros2_ws/install/ras_bt_framework/lib/ras_bt_framework/TrajectoryRecordsService.py
 ```
-![main_sess0 tab](images/main_sess0_tab_robot.png)
+![main_sess0 tab](images/main_sess0_robot_tab.png)
 
 2. robot:
 ```bash
@@ -571,7 +676,7 @@ b. dummy_logging_server.py:
 ```
 ![debugging tab](images/debugging_robot_tab.png)
 
-The Rviz and Ignition Gazebo will launch as shown in the below images:
+The Rviz will launch as shown in the below image:
 
 ![Rviz](images/Rviz_robot_app.png)
 
@@ -584,10 +689,10 @@ If the model does not spawn correctly:
 3. Use **UFactory Studio GUI** to verify the connection.
 
 ---
-## Step 10: Access the Server Container
-To log into the running server container:
+## Step 10: Access the Robot Container
+To log into the running robot container:
 ```bash
-ras server dev
+ras robot dev
 ```
 To exit:
 ```bash
@@ -596,8 +701,8 @@ exit
 or press `Ctrl + D`.
 
 ---
-## Step 11: Kill the Server App
-To stop the server app, use:
+## Step 11: Kill the Robot App
+To stop the robot app, use:
 ```bash
 ras_kill
 ```
