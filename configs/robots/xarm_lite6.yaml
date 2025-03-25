@@ -1,0 +1,24 @@
+name: "xarm_lite6"  # Robot identifier
+pose:  # Initial pose of the robot in the environment
+  x: -1.239280
+  y: -3.298410
+  z: 1.120070 
+  roll: 0.0
+  pitch: 0.0
+  yaw: -1.57
+home_joint_state:  # Default joint angles for the home position
+  joint1: 0
+  joint2: 0.17
+  joint3: 0.56
+  joint4: 0
+  joint5: 0.38
+  joint6: 0
+constraints:  # Motion constraints for the robot
+  workspace:  # Allowable workspace limits in meters
+    x: [-2.0, 2.0]
+    y: [-4.0, 4.0]
+    z: [0.0, 2.0]
+  orientation:  # Allowed orientation range in radians
+    roll: [-3.14, 3.14]
+    pitch: [-3.14, 3.14]
+    yaw: [-3.14, 3.14]
