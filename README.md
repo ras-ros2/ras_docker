@@ -44,7 +44,19 @@ Before starting, ensure your system has the following installed:
    - run the following command to check for the `docker installation`:
    ```bash
    docker
-4. **vcstool** (For managing repositories)
+4. **Nvidia Container Toolkit** (If your system have nvidia GPU installed)
+
+   Check for Nvidia GPU,
+   ```bash
+   nvidia-smi
+   ```
+   If not installed, it will show versions to install the nvidia drivers.
+   
+   If already have then run the following command to install nvidia container toolkit.
+   ```bash
+   sudo apt-get install -y nvidia-container-toolkit
+   ```
+6. **vcstool** (For managing repositories)
    ```bash
    python3 -m pip install vcstool
    ```
@@ -52,13 +64,13 @@ Before starting, ensure your system has the following installed:
    ```bash
    sudo apt install python3-pip
    ```
-5. **Argcomplete** (For auto-completing commands)
+7. **Argcomplete** (For auto-completing commands)
    ```bash
    sudo apt install python3-argcomplete
    ```
-6. **Stable Internet Connection** (Required to pull Docker images properly)
-7. **xArm Robotic Manipulator** (With Dedicated Desktop Setup for Robot Setup)
-8. **Robot Hardware Connection** (For Robot Desktop Setup)
+8. **Stable Internet Connection** (Required to pull Docker images properly)
+9. **xArm Robotic Manipulator** (With Dedicated Desktop Setup for Robot Setup)
+10. **Robot Hardware Connection** (For Robot Desktop Setup)
    Use an Ethernet cable to connect the robot and your PC.
    Default IP of xArm: `192.168.1.111`
 
