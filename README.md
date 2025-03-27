@@ -87,16 +87,17 @@ Before starting, ensure your system has the following installed:
    ping 192.168.1.111
    ```
    If packets are sent and received successfully, the connection is established.   
+   
 ---
 ## Installation
 
-## Step 1: Clone the Repository
+### Step 1: Clone the Repository
 Download the RAS Docker workspace files by running:
 ```bash
 git clone --recursive https://github.com/ras-ros2/ras_docker
 ```
 ---
-## Step 2: Set Up Environment
+### Step 2: Set Up Environment
 Go inside the `ras_docker` folder and set up the environment:
 ```bash
 cd ras_docker
@@ -106,13 +107,13 @@ Source the environment using the following command:
 . env.sh
 ```
 ---
-## Step 3: Check Available Commands
+### Step 3: Check Available Commands
 List available commands for the RAS Docker Interface (RDI):
 ```bash
 ras -h
 ```
 ---
-## Step 4: Initialize the App
+### Step 4: Initialize the App
 Set up the application:
 ```bash
 ras <app> init
@@ -124,7 +125,7 @@ ras <app> init -i
 This creates the `ras_server_app/ras_robot_app` folder inside the `apps` directory.
 
 ---
-## Step 5: Build the Application
+### Step 5: Build the Application
 Build the application:
 ```bash
 ras <app> build
@@ -139,7 +140,7 @@ If the ROS 2 workspace is not built then run it again.
 ras <app> build --clean
 ```
 ---
-## Step 6: Configure the Network
+### Step 6: Configure the Network
 Before running the <app>, configure `ras_conf.yaml`:
 ```bash
 nano ras_docker/configs/ras_conf.yaml
@@ -163,7 +164,7 @@ ras:
 For more examples, see [Network Configuration Setup README](Network_configuration_setup_readme.md).
 
 ---
-## Step 7: Run the App
+### Step 7: Run the App
 Start the app inside a Docker container:
 ```bash
 ras <app> run
@@ -171,7 +172,7 @@ ras <app> run
 For more details, see [Applications README](tmux_tabs_readme.md).
 
 ---
-## Step 8: Access the Container
+### Step 8: Access the Container
 To log into the running <app> container:
 ```bash
 ras <app> dev
@@ -183,12 +184,12 @@ exit
 or press `Ctrl + D`.
 
 ---
-## Step 9: Kill the App
+### Step 9: Kill the App
 To stop the app, use:
 ```bash
 ras_kill
 ```
-## Done!
+### Done!
 Your app is now set up and running. If you face any issues:
 - Follow the troubleshooting steps provided.
 - Restart your system.
