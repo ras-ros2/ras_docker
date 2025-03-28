@@ -1,4 +1,8 @@
+# This file defines a sequence of robot movements and actions
+# It specifies poses and a set of targets for robot motion
+
 Poses:
+  # Pose out1: Initial position before movement
   out1:
     x: 0.2
     y: 0
@@ -6,6 +10,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: 0
+  
+  # Pose above1: Hovering above pickup location
   above1:
     x: 0.2
     y: -0.35
@@ -13,6 +19,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: -1.575
+  
+  # Pose in1: Reaching into pickup location
   in1:
     x: 0.2
     y: -0.35
@@ -20,6 +28,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: -1.575
+  
+  # Pose out2: Transition position
   out2:
     x: 0.2
     y: 0
@@ -27,6 +37,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: -1.575
+  
+  # Pose above2: Hovering above drop-off location
   above2:
     x: 0.40
     y: 0.0
@@ -34,6 +46,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: -1.575
+  
+  # Pose in2: Reaching into drop-off location
   in2:
     x: 0.40
     y: 0.0
@@ -41,6 +55,8 @@ Poses:
     roll: 3.14
     pitch: 0
     yaw: -1.575
+  
+  # Pose out3: Intermediate position
   out3:
     x: 0.2
     y: -0.12
@@ -48,6 +64,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose front3: Facing pickup point
   front3:
     x: 0.16
     y: -0.14
@@ -55,6 +73,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose in3: Moving into pickup area
   in3:
     x: 0.28
     y: -0.14
@@ -62,6 +82,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose up4: Lifting up
   up4:
     x: 0.28
     y: -0.14
@@ -69,6 +91,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose left4: Moving sideways
   left4:
     x: 0.28
     y: -0.06
@@ -76,6 +100,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose above5: Preparing for final drop-off
   above5:
     x: 0.28
     y: -0.11
@@ -83,6 +109,8 @@ Poses:
     roll: 0
     pitch: 1.57
     yaw: 0
+  
+  # Pose out5: Moving to final position
   out5:
     x: 0.0
     y: 0.4
@@ -91,26 +119,28 @@ Poses:
     pitch: 1.57
     yaw: 0
 
+# Targets define the sequence of movements and actions the robot will follow
+
 targets:
-  - move2pose: out1
-  - move2pose: above1
-  - move2pose: in1
-  - gripper: true
-  - move2pose: above1
-  - move2pose: out2 
-  - move2pose: above2
-  - move2pose: in2
-  - gripper: false
-  - move2pose: above2
-  - move2pose: out2
-  - move2pose: out3
-  - move2pose: front3
-  - move2pose: in3
-  - gripper: true
-  - move2pose: up4
-  - move2pose: left4
-  - rotate: -1.57
-  - roatate: 1.57
-  - move2pose: above5
-  - move2pose: out5
-  - gripper: false
+  - move2pose: out1  # Move to initial position
+  - move2pose: above1  # Move above first pickup location
+  - move2pose: in1  # Reach into first pickup location
+  - gripper: true  # Activate gripper to grab object
+  - move2pose: above1  # Move back above pickup location
+  - move2pose: out2  # Transition to drop-off area
+  - move2pose: above2  # Hover above drop-off location
+  - move2pose: in2  # Reach into drop-off area
+  - gripper: false  # Release object
+  - move2pose: above2  # Move above drop-off location
+  - move2pose: out2  # Transition to next movement
+  - move2pose: out3  # Move to new intermediate position
+  - move2pose: front3  # Approach next pickup point
+  - move2pose: in3  # Reach into pickup point
+  - gripper: true  # Grab object
+  - move2pose: up4  # Lift object
+  - move2pose: left4  # Move left
+  - rotate: -1.57  # Rotate counterclockwise
+  - rotate: 1.57  # Rotate back clockwise
+  - move2pose: above5  # Move above final drop-off
+  - move2pose: out5  # Move to final position
+  - gripper: false  # Release object
