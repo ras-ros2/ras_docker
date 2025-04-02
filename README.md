@@ -28,16 +28,22 @@ If this message does not appear, troubleshoot by:
 
 ### 3. xArm Setup
 The orientation of xArm x, y, z coordinates and roll, pitch, yaw directions are denoted in the following image.
+- The base of the Arm has axis for linear motion
+    - x (Red arrow),
+    - y (green arrow),
+    - z (blue arrow) denotes positive direction for each.
+- The gripper has red, green and blue axis of rotation for roll, pitch and yaw respectively.
 
 ![Orientation of xarm_lite_6](Images/Orientation.png)
 
+---
 The home position of the robot is:
 ```yaml
 Pose: {x: 20, y: 0, z: 20, roll: 3.14, pitch: 0, yaw: 0}
 ```
 Here the pose x, y, z are measured in centimeters and pose roll, pitch, yaw in radians.
 
-![Home Position of xarm_lite_6](fig1_home_position.png)
+![Home Position of xarm_lite_6](Images/Home_Position.jpg)
 
 ## Understanding `0_stack.yaml`
 The `0_stack.yaml` file defines robot poses, and task sequences for the stacking experiment.
@@ -53,7 +59,7 @@ out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
 ```
 `out1` is the default position from where the experiment starts.
 
-![Default Position defined as out1](fig2_default_position.png)
+![Default Position defined as out1](Images/xArm.jpg)
 
 ## Targets
 Targets define the sequence of robot movements and actions.
@@ -83,8 +89,6 @@ Example pose definitions:
 out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
 ```
 `out1` is the default position from where the experiment starts.
-
-![Default Position defined as out1](fig2_default_position.png)
 
 ## Targets
 Targets define the sequence of robot movements and actions.
