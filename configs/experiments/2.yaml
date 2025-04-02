@@ -1,30 +1,31 @@
 # This file defines a sequence of robot movements and actions
 # It specifies poses and a set of targets for robot motion
+# Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
 Poses:
   # Pose 1: Starting/home position - where the robot begins
   pose1:
-    x: 0.2
+    x: 20
     y: 0
-    z: 0.5
+    z: 50
     roll: 3.14
     pitch: 0
     yaw: 0
  
   # Pose 2: Intermediate position
   pose2:
-    x: 0.417
-    y: 0.094
-    z: 0.280
+    x: 41.7
+    y: 09.4
+    z: 28.0
     roll: 3.14
     pitch: 0
     yaw: 0
   
   # Pose 3: Another movement target
   pose3:
-    x: 0.421
-    y: 0.010
-    z: 0.280
+    x: 42.1
+    y: 01.0
+    z: 28.0
     roll: 3.14
     pitch: 0
     yaw: 0

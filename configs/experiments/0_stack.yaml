@@ -3,7 +3,7 @@
 
 # Poses section defines all the positions the robot can move to
 
-# Each pose has x, y, z coordinates in meters and orientation (roll, pitch, yaw) in radians
+# Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
 # - out1: Starting/ending position
 # - above*: Positions above each location (for approach)
@@ -11,31 +11,31 @@
 
 Poses:
   # Starting/home position - where the robot begins and ends
-  out1: {x: 0.2, y: 0, z: 0.5, roll: 3.14, pitch: 0, yaw: 0}
+  out1: {x: 20.0, y: 0, z: 50.0, roll: 3.14, pitch: 0, yaw: 0}
   
   # First object location
-  above1: {x: 0.417, y: 0.094, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in1: {x: 0.417, y: 0.094, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  above1: {x: 41.7, y: 9.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 41.7, y: 9.4, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
   
   # Second object location
-  above2: {x: 0.421, y: 0.010, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in2: {x: 0.421, y: 0.010, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  above2: {x: 42.1, y: 1.0, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in2: {x: 42.1, y: 1.0, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
   
   # Third object location
-  above3: {x: 0.423, y: -0.066, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in3: {x: 0.423, y: -0.066, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  above3: {x: 42.3, y: -6.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in3: {x: 42.3, y: -6.6, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
   
   # Fourth location positions (for placing first object)
-  above4: {x: 0.337, y: -0.076, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in4: {x: 0.337, y: -0.076, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+  above4: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in4: {x: 33.7, y: -7.6, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
   
   # Fifth location positions (for stacking - first level, for placing second object)
-  above5: {x: 0.337, y: -0.076, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in5: {x: 0.337, y: -0.076, z: 0.190, roll: 3.14, pitch: 0, yaw: 0}
+  above5: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in5: {x: 33.7, y: -7.6, z: 19.0, roll: 3.14, pitch: 0, yaw: 0}
   
   # Sixth location positions (for stacking - second level, for placing third object)
-  above6: {x: 0.337, y: -0.076, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
-  in6: {x: 0.337, y: -0.076, z: 0.205, roll: 3.14, pitch: 0, yaw: 0}
+  above6: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in6: {x: 33.7, y: -7.6, z: 20.5, roll: 3.14, pitch: 0, yaw: 0}
   
 # Targets section defines the sequence of actions the robot will perform
 # Each operation follows the pattern:
