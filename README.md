@@ -1,100 +1,184 @@
-# RAS Docker Workspace
+# Experiment Setup Guide
 
-RAS Docker is the main workspace where two applications, **robot** and **server**, can be worked with seamlessly. This document provides an overview of its setup and usage.
+This readme explains the exisiting experiments and also how to create an experiment from scratch. It covers defining poses, locations, and actions using the YAML config files.
 
+## Prerequisites
+Ensure the following setups are completed before proceeding:
 
->Currently Ubuntu is officially supported distro for RAS
+### 1. Robot-Server Connection
+Open the `main_sess0` tab in the terminator of the robot app.
+Look for the message:
+```
+"Sync command executed successfully"
+```
+This confirms the robot-server connection is established.
 
-## Prequisites to use RAS
+If this message does not appear, troubleshoot by:
+- Re-running both the server and robot, and checking the configuration setup.
+- Ensuring the network connection is stable.
+- Pinging the robot's IP:
+  ```
+  ping 192.168.1.111
+  ```
+  to verify the robot is connected to the app.
 
-Before using RAS, ensure that you have the following dependencies installed:
+### 2. GUI Tools
+- **Server App:** Ensure RViz and Gazebo launch without errors.
+- **Robot App:** Ensure RViz launches without errors.
 
-1. **Vcstool** - A command-line tool for managing multiple repositories in ROS2 workspaces.
+### 3. xArm Setup
+The orientation of xArm x, y, z coordinates and roll, pitch, yaw directions are denoted in the following image.
 
-```bash
-python3 -m pip install vcstool
+![Orientation of xarm_lite_6](Images/Orientation.png)
+
+The home position of the robot is:
+```yaml
+Pose: {x: 20, y: 0, z: 20, roll: 3.14, pitch: 0, yaw: 0}
+```
+Here the pose x, y, z are measured in centimeters and pose roll, pitch, yaw in radians.
+
+![Home Position of xarm_lite_6](fig1_home_position.png)
+
+## Understanding `0_stack.yaml`
+The `0_stack.yaml` file defines robot poses, and task sequences for the stacking experiment.
+
+### Poses
+Poses define specific positions in 3D space for robot movement:
+- **x, y, z:** Coordinates for robotic arm movement in 3D space.
+- **roll, pitch, yaw:** Orientation of the gripper.
+
+Example pose definitions:
+```yaml
+out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
+```
+`out1` is the default position from where the experiment starts.
+
+![Default Position defined as out1](fig2_default_position.png)
+
+## Targets
+Targets define the sequence of robot movements and actions.
+
+Example Actions Breakdown:
+```yaml
+- Move to out1
+- Pick from above1
+- Place at above4
+- Pick from above2
+- Place at above5
+- Pick from above3
+- Place at above6
+- Move to out1
 ```
 
-2. **Docker-CE** - The community edition of Docker for containerized application management and Nvidia Container Toolkit if device has Nvidia GPU.
+## Understanding `4_destack.yaml`
+The `4_destack.yaml` file defines robot poses, and task sequences for the destacking experiment.
 
-- [Docker](https://docs.docker.com/engine/install/ubuntu/)
+### Poses
+Poses define specific positions in 3D space for robot movement:
+- **x, y, z:** Coordinates for robotic arm movement in 3D space.
+- **roll, pitch, yaw:** Orientation of the gripper.
 
-- [Nvidia Contianer Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+Example pose definitions:
+```yaml
+out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
+```
+`out1` is the default position from where the experiment starts.
 
-3. **Argcomplete** - A Python package that provides tab completion for command-line programs.
+![Default Position defined as out1](fig2_default_position.png)
 
-```bash
-sudo apt install python3-argcomplete
+## Targets
+Targets define the sequence of robot movements and actions.
+
+Example Actions Breakdown:
+```yaml
+- Move to out1
+- Pick from above6
+- Place at above3
+- Pick from above5
+- Place at above2
+- Pick from above4
+- Place at above1
+- Move to out1
 ```
 
-4. **Git** - A version control system used for tracking changes in source code.
+## Running the Experiment
 
+### Step 1: Load the Experiment
+Run the following command on the server:
 ```bash
-sudo apt install git
+ras_cli load_experiment <experiment_name>
+```
+This command loads the destacking experiment using the `ras_sim_lab` repository.
+
+### Step 2: Run the Simulation Robot
+Run the following command:
+```bash
+ras_cli run_sim_robot
+```
+This starts the behavior tree (BT) execution, which follows the XML configuration at:
+```yaml
+/ras_server_app/ros2_ws/src/common_pkg/ras_bt_framework/xml/sim.xml
+```
+If successful, the log will show:
+```
+"BT Execution Successful"
 ```
 
-
-## 1. Clone the Repository
+### Step 3: Run the Real Robot
+Run the command:
 ```bash
-git clone --recursive https://github.com/ras-ros2/ras_docker
+ras_cli run_real_robot
+```
+Check the Robot App logs for:
+```
+"Connected to MQTT Broker"
+"Connected to FileServer"
+```
+These messages confirm a successful connection to the FileServer.
+
+## Trajectory and File Generation
+A trajectory is generated based on the simulation and saved at:
+```yaml
+ras_docker/ros2_pkgs/ras_bt_framework/xml/
+```
+The robot downloads and executes this trajectory, ensuring synchronization between the simulation and real-world execution.
+
+Upon successful execution, the logs will display:
+```
+"Behavior Tree Execution Successful"
 ```
 
-## RAS Docker Interface (RAS)
-RAS Docker includes a command-line utility called **RDI** (RAS Docker Interface), implemented in `ras_docker` package under the `scripts` directory.
-
-### 2. Source the Environment File
-```bash
-source ./ras_docker/env.sh
+The server logs will confirm:
+```
+Result success: true, Goal finished with status: SUCCEEDED
 ```
 
-### 3. Check Available Commands
-To see the available RDI commands, run:
-```bash
-ras -h
+## Steps to create your own experiment
+
+### Step 1: Create a YAML File
+- Create a new YAML file inside config/experiments/ with a meaningful experiment name, e.g., stacking.yaml.
+
+### Step 2: Define Poses
+- Poses represent key locations for the robot during the experiment. Each pose includes:
+  - Position (x, y, z) in centimeters,
+  - Orientation (roll, pitch, yaw) in radians,
+  - and a name (Ex-out1, in1 etc) to have a better understanding to that pose.
+ 
+### Step 3: Define Targets
+- The targets defines the sequence of actions the robot will execute.
+- For example:
+```yaml
+- Move to out1 (any default position)
+- Move to location1 (first object location)
+- Pick the object at location1
+- Place the object at goal_location
+- repeat above actions with objects placed at different locations
+- Move to out1 (get back to default position)
 ```
 
-## Directory Structure
-### `apps` Directory
-The `apps` directory houses the two applications, **server** and **robot**, which are Docker containers built using the Docker images located in the `context` directory.
-
-### `context` Directory
-The `context` directory contains the Docker images used to build the applications:
-1. **Dockerfile.base**: Based on the `humble-desktop-full` image, it installs dependencies common to both applications (e.g., `python3-pip`).
-2. **Dockerfile.server**: Extends `Dockerfile.base` and adds dependencies specific to the **server** application (e.g., `ignition-fortress`).
-3. **Dockerfile.robot**: Extends `Dockerfile.base` and adds dependencies specific to the **robot** application.
-
-### 4. Check App-Specific Commands
-To see commands specific to an application (e.g., `server`):
-```bash
-ras server -h
-```
-
-## Working with the Server Application
-### 5. Initialize Server
-```bash
-ras server init
-```
-This creates a `ras_server_app` directory under the `apps` folder.
-
-### 6. Build the Docker Image for the Server App
-```bash
-ras server build
-```
-
-### 7. Build the ROS 2 Workspace
-```bash
-ras server build
-```
-This builds the `src` folder inside the `ros2_ws` directory present in `ras_server_app`.
-
-### 8. Run the Server Lab
-```bash
-ras server run
-```
-This starts the container and executes the code defined in the `run.sh` file within `ras_server_app`.
-
-### 9. Hack into the container
-```bash
-ras server dev
-```
-Login to the container, explore and hack your way into the application.
+## Workspace Dimensions for xArm Lite 6
+The xArm Lite 6 has the following workspace dimensions:
+- X (Forward-Backward): Approximately -44 cm to 44 cm
+- Y (Left-Right): Approximately -44 cm to 44 cm
+- Z (Up-Down): Approximately 0 cm to 55 cm
+All defined poses should fall within these limits to ensure valid robot operation.
