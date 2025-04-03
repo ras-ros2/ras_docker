@@ -14,28 +14,28 @@ Poses:
   out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
   
   # First object location (topmost object in the stack)
-  above1: {x: 41.7, y: 09.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in1: {x: 41.7, y: 09.4, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
+  above1: {x: 41.7, y: 9.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 41.7, y: 9.4, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
   
   # Second object location (middle object in the stack)
-  above2: {x: 42.1, y: 01.0, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in2: {x: 42.1, y: 01.0, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
+  above2: {x: 42.1, y: 1.0, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in2: {x: 42.1, y: 1.0, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
   
   # Third object location (bottom-most object in the stack)
-  above3: {x: 42.3, y: -06.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in3: {x: 42.3, y: -06.6, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
+  above3: {x: 42.3, y: -6.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in3: {x: 42.3, y: -6.4, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
   
   # Fourth location positions (where the first object was placed originally)
-  above4: {x: 33.7, y: -07.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in4: {x: 33.7, y: -07.6, z: 17.5, roll: 3.14, pitch: 0, yaw: 0}
+  above4: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in4: {x: 33.7, y: -7.6, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
   
   # Fifth location positions (where the second object was placed originally)
-  above5: {x: 33.7, y: -07.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in5: {x: 33.7, y: -07.6, z: 19.0, roll: 3.14, pitch: 0, yaw: 0}
+  above5: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in5: {x: 33.7, y: -7.6, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
   
   # Sixth location positions (where the third object was placed originally)
-  above6: {x: 33.7, y: -07.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
-  in6: {x: 33.7, y: -07.6, z: 20.5, roll: 3.14, pitch: 0, yaw: 0}
+  above6: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in6: {x: 33.7, y: -7.6, z: 22.6, roll: 3.14, pitch: 0, yaw: 0}
   
 # Targets section defines the sequence of actions the robot will perform for de-stacking
 # Each operation follows the pattern:
