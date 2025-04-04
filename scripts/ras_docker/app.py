@@ -43,9 +43,9 @@ def init_app(args: argparse.Namespace):
     # if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
     #     dep_repos_file = app_path/"deps.repos"
     #     vcs_fetch_repos(dep_repos_file,app_path,pull=True)
-    force_pull = (hasattr(args,"image_pull") and args.image_pull)
-    pull_from_docker_repo("ras_base",force_pull)
-    pull_from_docker_repo(app_name,force_pull)
+    # force_pull = (hasattr(args,"image_pull") and args.image_pull)
+    # pull_from_docker_repo("ras_base",force_pull)
+    # pull_from_docker_repo(app_name,force_pull)
 
 
 @dataclass
