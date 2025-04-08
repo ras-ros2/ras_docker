@@ -1,0 +1,102 @@
+Poses:
+  out1: {x: 0.2, y: 0, z: 0.5, roll: 3.14, pitch: 0, yaw: 0}
+
+Grids:
+  grid0:
+    pose: {x: 0.0, y: 0.0, z: 0.165, roll: 3.14, pitch: 0, yaw: 0}
+    locations:
+      x1y1: {x: -0.08, y: 0.08}
+      x1y2: {x: -0.08, y: 0.0}
+      x1y3: {x: -0.08, y: -0.08}
+      x2y1: {x: 0.0, y: 0.08}
+      x2y2: {x: 0.0, y: 0.0}
+      x2y3: {x: 0.0, y: -0.08}
+      x3y1: {x: 0.08, y: 0.08}
+      x3y2: {x: 0.08, y: 0.0}
+      x3y3: {x: 0.08, y: -0.08}
+
+targets:
+  - move2pose: out1
+  - pick_location:
+      object: wooden_cube1
+      grid: grid0
+      location: x1y1
+  - place_location:
+      object: wooden_cube1
+      grid: grid0
+      location: x3y3
+      level: 0
+  - pick_location:
+      object: wooden_cube2
+      grid: grid0
+      location: x1y2
+  - place_location:
+      object: wooden_cube2
+      grid: grid0
+      location: x3y3
+      level: 1
+  - pick_location:
+      object: wooden_cube3
+      grid: grid0
+      location: x1y3
+  - place_location:
+      object: wooden_cube3
+      grid: grid0
+      location: x3y3
+      level: 2
+  - pick_location:
+      object: wooden_cube4
+      grid: grid0
+      location: x2y1
+  - place_location:
+      object: wooden_cube4
+      grid: grid0
+      location: x3y3
+      level: 3
+  - pick_location:
+      object: wooden_cube5
+      grid: grid0
+      location: x2y2
+  - place_location:
+      object: wooden_cube5
+      grid: grid0
+      location: x3y3
+      level: 4
+  - pick_location:
+      object: wooden_cube6
+      grid: grid0
+      location: x2y3
+  - place_location:
+      object: wooden_cube6
+      grid: grid0
+      location: x3y3
+      level: 5
+  - pick_location:
+      object: wooden_cube7
+      grid: grid0
+      location: x3y1
+  - place_location:
+      object: wooden_cube7
+      grid: grid0
+      location: x3y3
+      level: 6
+  - pick_location:
+      object: wooden_cube8
+      grid: grid0
+      location: x3y2
+  - place_location:
+      object: wooden_cube8
+      grid: grid0
+      location: x3y3
+      level: 7
+  - pick_location:
+      object: wooden_cube9
+      grid: grid0
+      location: x3y3
+  - place_location:
+      object: wooden_cube9
+      grid: grid0
+      location: x3y3
+      level: 8
+  - move2pose: out1
+

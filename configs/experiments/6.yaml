@@ -1,0 +1,45 @@
+Poses:
+  out1: {x: 0.2, y: 0, z: 0.5, roll: 3.14, pitch: 0, yaw: 0}
+  above1: {x: 0.425, y: 0.010, z: 0.280, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 0.425, y: 0.010, z: 0.175, roll: 3.14, pitch: 0, yaw: 0}
+
+Grids:
+  grid0:
+    pose: {x: 0.425, y: 0.010, z: 0.165, roll: 3.14, pitch: 0, yaw: 0}
+    locations:
+      x1y1: {x: 0.0, y: 0.08}
+      x1y2: {x: 0.0, y: 0.0}
+      x2y1: {x: -0.08, y: 0.08}
+      x2y2: {x: -0.08, y: 0.0}
+      stack: {x: 0.08, y: 0.0}  # Reserved for stacking
+
+targets:
+  - move2pose: out1
+  - pick_location:
+      object: wooden_cube1
+      grid: grid0
+      location: x1y1
+  - place_location:
+      object: wooden_cube1
+      grid: grid0
+      location: stack
+  - pick_location:
+      object: wooden_cube2
+      grid: grid0
+      location: x1y2
+  - place_location:
+      object: wooden_cube2
+      grid: grid0
+      location: stack
+      level: 1
+  - pick_location:
+      object: wooden_cube3
+      grid: grid0
+      location: x2y1
+  - place_location:
+      object: wooden_cube3
+      grid: grid0
+      location: stack
+      level: 2
+  - move2pose: out1
+

@@ -75,8 +75,8 @@ def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,rem
         exit(1)
     if remove_cn:
         extra_docker_args += " --rm "
-    # if app_conf.app_name == "ras_server_app":
-    extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    if app_conf.app_name == "ras_server_app":
+        extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
     docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
         display_env=f"{get_display_var()}",
         app_dir=str(app_path),

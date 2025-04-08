@@ -21,7 +21,7 @@ Grids:
       x2y2: {x: -0.08, y: 0.0}
       x2y3: {x: -0.08, y: -0.08}
 
-targets:
+old_targets:
   - move2pose: out1
   - pick_location:
       object: wooden_cube1
@@ -75,7 +75,7 @@ targets:
   #     location: x2y3
   - move2pose: out1
 
-old_targets:
+targets:
   ##setup tasks##
   # - move2pose: out1
   # - gripper: true
