@@ -1,0 +1,87 @@
+# This file defines a sequence of robot movements and actions for de-stacking objects
+# This file performs the reverse operation of the stacking experiment.
+
+# Poses section defines all the positions the robot can move to
+
+# Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
+
+# - out1: Starting/ending position
+# - above*: Positions above each location (for approach)
+# - in*: Positions at each location (for picking/placing)
+
+Poses:
+  # Starting/home position - where the robot begins and ends
+  out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # First object location (topmost object in the stack)
+  above1: {x: 41.7, y: 9.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 41.7, y: 9.4, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Second object location (middle object in the stack)
+  above2: {x: 42.1, y: 1.0, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in2: {x: 42.1, y: 1.0, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Third object location (bottom-most object in the stack)
+  above3: {x: 42.3, y: -6.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in3: {x: 42.3, y: -6.4, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Fourth location positions (where the first object was placed originally)
+  above4: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in4: {x: 33.7, y: -7.6, z: 17.4, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Fifth location positions (where the second object was placed originally)
+  above5: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in5: {x: 33.7, y: -7.6, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Sixth location positions (where the third object was placed originally)
+  above6: {x: 33.7, y: -7.6, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
+  in6: {x: 33.7, y: -7.6, z: 22.6, roll: 3.14, pitch: 0, yaw: 0}
+  
+# Targets section defines the sequence of actions the robot will perform for de-stacking
+# Each operation follows the pattern:
+# 1. Move to starting position (out1)
+# 2. Move above stacked object
+# 3. Move to stacked object
+# 4. Close gripper (true)
+# 5. Move to previous above location
+# 6. Move above original location
+# 7. Move to original location
+# 8. Open gripper (false)
+# 9. Move to previous above location
+
+targets:
+  # starting position
+  - move2pose: out1
+
+  # Operation 1: Move object from position 6 to position 3 (topmost object)
+  - move2pose: above6
+  - move2pose: in6
+  - gripper: true
+  - move2pose: above6
+  - move2pose: above3
+  - move2pose: in3
+  - gripper: false
+  - move2pose: above3
+
+  # Operation 2: Move object from position 5 to position 2 (middle object)
+  - move2pose: above5
+  - move2pose: in5
+  - gripper: true
+  - move2pose: above5
+  - move2pose: above2
+  - move2pose: in2
+  - gripper: false
+  - move2pose: above2
+
+  # Operation 3: Move object from position 4 to position 1 (bottom-most object)
+  - move2pose: above4
+  - move2pose: in4
+  - gripper: true
+  - move2pose: above4
+  - move2pose: above1
+  - move2pose: in1
+  - gripper: false
+  - move2pose: above1
+
+  # Return to starting position
+  - move2pose: out1

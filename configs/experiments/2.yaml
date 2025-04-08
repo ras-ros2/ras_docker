@@ -1,63 +1,39 @@
-Poses:
-  pose1:
-    x: 0.0
-    y: -0.25
-    z: 0.2
-    roll: -1.57
-    pitch: 0.0
-    yaw: 3.14
-  pose2:
-    x: -0.25
-    y: -0.25
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose3:
-    x: -0.25
-    y: 0.0
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose4:
-    x: -0.25
-    y: 0.25
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose5:
-    x: 0.0
-    y: 0.25
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose6:
-    x: 0.25
-    y: 0.25
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose7:
-    x: 0.25
-    y: 0.0
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
-  pose8:
-    x: 0.25
-    y: -0.25
-    z: 0.2
-    roll: 3.14
-    pitch: 0
-    yaw: -1.57
+# This file defines a sequence of robot movements and actions
+# It specifies poses and a set of targets for robot motion
+# Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
+Poses:
+  # Pose 1: Starting/home position - where the robot begins
+  pose1:
+    x: 20
+    y: 0
+    z: 50
+    roll: 3.14
+    pitch: 0
+    yaw: 0
+ 
+  # Pose 2: Intermediate position
+  pose2:
+    x: 41.7
+    y: 09.4
+    z: 28.0
+    roll: 3.14
+    pitch: 0
+    yaw: 0
+  
+  # Pose 3: Another movement target
+  pose3:
+    x: 42.1
+    y: 01.0
+    z: 28.0
+    roll: 3.14
+    pitch: 0
+    yaw: 0
+
+# Targets define the sequence of movements the robot will follow
+# Each step moves the robot to a predefined pose
 
 targets:
-  - move2pose: pose1
-  - move2pose: pose2
-  - move2pose: pose3
+  - move2pose: pose1  # Move to starting position
+  - move2pose: pose2  # Move to intermediate position
+  - move2pose: pose3  # Move to final target position
