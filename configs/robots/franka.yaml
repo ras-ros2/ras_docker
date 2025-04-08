@@ -1,0 +1,25 @@
+name: "franka"  # Robot identifier
+pose:  # Initial pose of the robot in the environment
+  x: 0.0
+  y: 0.0
+  z: 0.0
+  roll: 0.0
+  pitch: 0.0
+  yaw: 0.0
+home_joint_state:  # Default joint angles for the home position
+  joint1: 0.0
+  joint2: -0.785
+  joint3: 0.0
+  joint4: -2.356
+  joint5: 0.0
+  joint6: 1.571
+  joint7: 0.785
+constraints:  # Motion constraints for the robot
+  workspace:  # Allowable workspace limits in meters
+    x: [-0.855, 0.855]
+    y: [-0.855, 0.855]
+    z: [0.0, 1.2]
+  orientation:  # Allowed orientation range in radians
+    roll: [-3.14, 3.14]
+    pitch: [-3.14, 3.14]
+    yaw: [-3.14, 3.14]

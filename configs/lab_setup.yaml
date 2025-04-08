@@ -1,78 +1,11 @@
-# lab_setup:
-#   lab_name: "oss_lab1"
-# #   real_sim: "aruco_world" # with perception (significantly slower)
-#   real_sim: "oss_lab1" # without perception
-#   robot:
-#       name: "xarm_lite6"
-#       pose:
-#           x: -1.239280
-#           y: -3.298410
-#           z: 1.120070
-#           roll: 0.0
-#           pitch: 0.0
-#           yaw: -1.57
-#       home_joint_state:
-#           joint1: 0
-#           joint2: 0.17
-#           joint3: 0.56
-#           joint4: 0
-#           joint5: 0.38
-#           joint6: 0
-
 lab_setup:
-  lab_name: "oss_lab1"
-#   real_sim: "aruco_world" # with perception (significantly slower)
-  real_sim: "oss_lab1" # without perception
-  robot_name: "xarm_lite6"
-  xarm_lite6:
-      name: "xarm_lite6"
-      pose:
-          x: -1.239280
-          y: -3.298410
-          z: 1.120070
-          roll: 0.0
-          pitch: 0.0
-          yaw: -1.57
-      home_joint_state:
-          joint1: 0
-          joint2: 0.17
-          joint3: 0.56
-          joint4: 0
-          joint5: 0.38
-          joint6: 0
-      constraints:
-          workspace:
-              x: [-2.0, 2.0]
-              y: [-4.0, 4.0]
-              z: [0.0, 2.0]
-          orientation:
-              roll: [-3.14, 3.14]
-              pitch: [-3.14, 3.14]
-              yaw: [-3.14, 3.14]
-  franka:
-      name: "franka"
-      pose:
-          x: 0.0
-          y: 0.0
-          z: 0.0
-          roll: 0.0
-          pitch: 0.0
-          yaw: 0.0
-      home_joint_state:
-          joint1: 0.0
-          joint2: -0.785
-          joint3: 0.0
-          joint4: -2.356
-          joint5: 0.0
-          joint6: 1.571
-          joint7: 0.785
-      constraints:
-          workspace:
-              x: [-0.855, 0.855]
-              y: [-0.855, 0.855]
-              z: [0.0, 1.2]
-          orientation:
-              roll: [-3.14, 3.14]
-              pitch: [-3.14, 3.14]
-              yaw: [-3.14, 3.14]
+  lab_name: "oss_lab1"  # Name of the lab environment
 
+  # Choose the simulation environment
+  # "aruco_world" includes perception but is significantly slower
+  # "oss_lab1" runs without perception for faster performance
+  real_sim: "oss_lab1"
+
+  robot_name: "jay"  # Primary robot in the setup
+  robot_config_file: "robots/{robot_name}.yaml"
+ 
