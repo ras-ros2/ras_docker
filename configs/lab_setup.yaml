@@ -6,6 +6,6 @@ lab_setup:
   # "oss_lab1" runs without perception for faster performance
   real_sim: "oss_lab1"
 
-  robot_name: "jay"  # Primary robot in the setup
+  robot_name: "xarm_lite6"  # Primary robot in the setup
   robot_config_file: "robots/{robot_name}.yaml"
  
