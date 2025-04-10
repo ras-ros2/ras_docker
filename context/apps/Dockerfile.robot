@@ -13,7 +13,7 @@ RUN mkdir -p /ras_robot_app
 RUN apt update && apt install -y inetutils-ping
 RUN apt install wget unzip -y
 RUN pip install xArm-Python-SDK
-
+RUN apt install -y ros-humble-realsense2-camera
 USER ras
 RUN python3 -m pip install flask pyftpdlib paho-mqtt opencv-contrib-python==4.7.0.72 numpy==1.21.5
 USER root

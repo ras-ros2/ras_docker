@@ -75,6 +75,7 @@ def is_wsl():
 def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     docker_cmd_fmt_prefix = """docker run -it \
                 -e DISPLAY={display_env} \
+                -e APP_TYPE={app_type} \
                 --user {user_id}:{user_id} \
                 -v /etc/localtime:/etc/localtime:ro \
                 --name {container_name} \
@@ -128,7 +129,8 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     if (cmd_type==DockerCmdType.FULL):
         return partial(docker_cmd_fmt,
                 display_env=get_display_var(),
-                gpu_arg= docker_gpu_arg
+                gpu_arg= docker_gpu_arg,
+                app_type=os.environ.get("APP_TYPE", "robot")
             )
     elif (cmd_type==DockerCmdType.RAW):
         return partial(docker_cmd_fmt,

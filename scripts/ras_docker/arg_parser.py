@@ -19,7 +19,7 @@ Harsh Davda
 Email: info@opensciencestack.org
 """
 # PYTHON_ARGCOMPLETE_OK
-
+import os
 import argcomplete, argparse
 from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits,kill_app
 from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode,get_vcs_status
@@ -96,6 +96,9 @@ def get_parser(test_func_en = False):
 
 def parse_args(parser : argparse.ArgumentParser,test_func = None):
     args = parser.parse_args()
+
+    if hasattr(args, "app") and args.app in supported_apps:
+        os.environ["APP_TYPE"] = args.app
     if (not hasattr(args, "app")) or isinstance(args.app, type(None)):
         parser.print_help()
         exit(1)
