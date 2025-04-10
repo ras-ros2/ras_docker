@@ -35,7 +35,7 @@ supported_assets = ["manipulator"]
 supported_apps = ["robot","server"]
 
 def get_repos_vcs():
-    return VCS(vcs_repos_path,repos_url,"main")
+    return VCS(vcs_repos_path,repos_url,"feature/merged_repos")
 
 def get_setup_vcs_mapping():
     if not vcs_repos_path.exists():
