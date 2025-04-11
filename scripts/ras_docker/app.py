@@ -1,24 +1,3 @@
-"""
-Copyright (C) 2024 Harsh Davda
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For inquiries or further information, you may contact:
-Harsh Davda
-Email: info@opensciencestack.org
-"""
-
 from .arg_parser import argparse
 from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType,is_wsl
 from .vcs import init_setup,init_app_setup
@@ -43,9 +22,9 @@ def init_app(args: argparse.Namespace):
     # if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
     #     dep_repos_file = app_path/"deps.repos"
     #     vcs_fetch_repos(dep_repos_file,app_path,pull=True)
-    force_pull = (hasattr(args,"image_pull") and args.image_pull)
-    pull_from_docker_repo("ras_base",force_pull)
-    pull_from_docker_repo(app_name,force_pull)
+     force_pull = (hasattr(args,"image_pull") and args.image_pull)
+     pull_from_docker_repo("ras_base",force_pull)
+     pull_from_docker_repo(app_name,force_pull)
 
 
 @dataclass
@@ -64,31 +43,73 @@ class AppCoreConf(CoreDockerConf):
 
 
 
-def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,remove_cn=True,extra_docker_args = ""):
+# def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,remove_cn=True,extra_docker_args = ""):
+#     app_conf = AppCoreConf(args.app)
+#     app_path = WORKING_PATH/'apps'/app_conf.app_name
+#     config_dir=str(WORKING_PATH/'configs')
+#     asset_dir=str(WORKING_PATH/'assets')
+#     if not app_path.exists():
+#         print(f"Error: {app_path} does not exist")
+#         print(f"Please run the init command first")
+#         exit(1)
+#     if remove_cn:
+#         extra_docker_args += " --rm "
+#     # if app_conf.app_name == "ras_server_app":
+#     extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+#     docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
+#         display_env=f"{get_display_var()}",
+#         app_dir=str(app_path),
+#         work_dir="/"+app_conf.app_name,
+#         extra_docker_args=f"-v {config_dir}:/{app_conf.app_name}/configs {extra_docker_args}"
+#     )
+#     allow_login = args.command in ["dev","run"]
+#     docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
+#     if isinstance(docker_cmd_fmt_new,type(None)):
+#         print("Already Running")
+#         exit(1)
+#     return docker_cmd_fmt_new
+
+def get_app_spacific_docker_cmd(args: argparse.Namespace, docker_cmd_fmt_src, remove_cn=True, extra_docker_args=""):
     app_conf = AppCoreConf(args.app)
-    app_path = WORKING_PATH/'apps'/app_conf.app_name
-    config_dir=str(WORKING_PATH/'configs')
-    asset_dir=str(WORKING_PATH/'assets')
+    app_path = WORKING_PATH / 'apps' / app_conf.app_name
+    config_dir = str(WORKING_PATH / 'configs')
+    asset_dir = str(WORKING_PATH / 'assets')
+
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
         print(f"Please run the init command first")
         exit(1)
+
+    # Freshly construct docker args for this app
+    docker_args = ""
     if remove_cn:
-        extra_docker_args += " --rm "
+        docker_args += " --rm "
+    
+    # Only mount assets if this is the server app
     if app_conf.app_name == "ras_server_app":
-        extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
-    docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
+        docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    
+    # Always mount the config directory
+    docker_args = f"-v {config_dir}:/{app_conf.app_name}/configs {docker_args}"
+
+    docker_cmd_fmt_local = partial(
+        docker_cmd_fmt_src,
         display_env=f"{get_display_var()}",
         app_dir=str(app_path),
-        work_dir="/"+app_conf.app_name,
-        extra_docker_args=f"-v {config_dir}:/{app_conf.app_name}/configs {extra_docker_args}"
+        work_dir="/" + app_conf.app_name,
+        extra_docker_args=docker_args
     )
-    allow_login = args.command in ["dev","run"]
-    docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
-    if isinstance(docker_cmd_fmt_new,type(None)):
+
+    allow_login = args.command in ["dev", "run"]
+    docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local, app_conf, allow_login=allow_login)
+
+    if docker_cmd_fmt_new is None:
         print("Already Running")
         exit(1)
+
     return docker_cmd_fmt_new
+
+
 
 
 def build_image_app(args : argparse.Namespace):
