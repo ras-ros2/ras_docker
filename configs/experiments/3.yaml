@@ -3,8 +3,8 @@
 # Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
 Poses:
-  # Pose out1: Initial position before movement
-  out1:
+  # Pose home: Initial position before movement
+  home:
     x: 20
     y: 0
     z: 50
@@ -123,25 +123,20 @@ Poses:
 # Targets define the sequence of movements and actions the robot will follow
 
 targets:
-  - move2pose: out1  # Move to initial position
-  - move2pose: above1  # Move above first pickup location
-  - move2pose: in1  # Reach into first pickup location
-  - gripper: true  # Activate gripper to grab object
-  - move2pose: above1  # Move back above pickup location
-  - move2pose: out2  # Transition to drop-off area
-  - move2pose: above2  # Hover above drop-off location
-  - move2pose: in2  # Reach into drop-off area
-  - gripper: false  # Release object
-  - move2pose: above2  # Move above drop-off location
-  - move2pose: out2  # Transition to next movement
-  - move2pose: out3  # Move to new intermediate position
-  - move2pose: front3  # Approach next pickup point
-  - move2pose: in3  # Reach into pickup point
-  - gripper: true  # Grab object
-  - move2pose: up4  # Lift object
-  - move2pose: left4  # Move left
+  - Move: home  # Move to initial position
+  - Move: above1  # Move above first pickup location
+  - Pick: in1  # Reach into first pickup location and pick
+  - Move: out2  # Transition to drop-off area
+  - Move: above2  # Hover above drop-off location
+  - Place: in2  # Reach into drop-off area
+  - Move: above2  # Move above drop-off location
+  - Move: out2  # Transition to next movement
+  - Move: out3  # Move to new intermediate position
+  - Move: front3  # Approach next pickup point
+  - Pick: in3  # Reach into pickup point
+  - Move: up4  # Lift object
+  - Move: left4  # Move left
   - rotate: -1.57  # Rotate counterclockwise
   - rotate: 1.57  # Rotate back clockwise
-  - move2pose: above5  # Move above final drop-off
-  - move2pose: out5  # Move to final position
-  - gripper: false  # Release object
+  - Move: above5  # Move above final drop-off
+  - Place: out5  # Move to final position

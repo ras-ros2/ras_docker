@@ -34,6 +34,6 @@ Poses:
 # Each step moves the robot to a predefined pose
 
 targets:
-  - move2pose: pose1  # Move to starting position
-  - move2pose: pose2  # Move to intermediate position
-  - move2pose: pose3  # Move to final target position
+  - Move: pose1  # Move to starting position
+  - Move: pose2  # Move to intermediate position
+  - Move: pose3  # Move to final target position
