@@ -1,42 +1,38 @@
-"""
-Copyright (C) 2024 Harsh Davda
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For inquiries or further information, you may contact:
-Harsh Davda
-Email: info@opensciencestack.org
-"""
-# PYTHON_ARGCOMPLETE_OK
-
+import os
 import argcomplete, argparse
 from .app import build_image_app,run_image_app,init_app,run_image_command,run_image_commits,kill_app
 from .vcs import init_setup,clear_setup,init_app_setup,repos_vcs_version,pull_repos_vcs,url_mode,get_vcs_status
+
 supported_apps = ["robot","server"]
 
 def get_parser(test_func_en = False):
+    """
+    Create and configure the argument parser for the RAS application interface.
+
+    Args:
+        test_func_en (bool): If True, includes the 'test' command under each app.
+
+    Returns:
+        argparse.ArgumentParser: The configured argument parser.
+    """
     def add_nested_subparsers(subparser: argparse.ArgumentParser):
+        """
+        Adds nested subparsers to the given app-level parser for commands like init, build, run, etc.
+
+        Args:
+            subparser (argparse.ArgumentParser): The app-level parser to attach subcommands to.
+
+        Returns:
+            argparse._SubParsersAction: The nested subparsers object.
+        """
         nested_subparsers = subparser.add_subparsers(title="app",dest="command", help="Command to execute")
 
         nested_init_parser = nested_subparsers.add_parser("init", help="Initialize the application")
         nested_init_parser.add_argument("--image-pull","-i", action="store_true",default=False,dest="image_pull", help="Force pull the image from the docker repo")
-        # nested_init_parser.add_argument("--dockerhub","-d",action="store_true",default=False)
 
         nested_build_parser = nested_subparsers.add_parser("build", help="Build the robot image")
         nested_build_parser.add_argument("--force", action="store_true", help="Force rebuild of the image")
         nested_build_parser.add_argument("--clean", action="store_true", help="Clean up intermediate build files")
-        # nested_build_parser.add_argument("--offline", action="store_true", help="Build the image offline")
 
         nested_run_parser = nested_subparsers.add_parser("run", help="Run the robot robot image")
         nested_run_parser.add_argument("args", nargs=argparse.REMAINDER, help="Arguments to pass to the run command")
@@ -49,7 +45,6 @@ def get_parser(test_func_en = False):
         nested_dev_parser.add_argument("--terminator","-t", action="store_true", help="Open terminal in terminator")
         nested_dev_parser.add_argument("--vscode","-v", action="store_true", help="Attach container in vscode")
 
-        # nested_push_parser = nested_subparsers.add_parser("push", help="Push the repos ")
         if test_func_en:
             nested_test_parser = nested_subparsers.add_parser("test", help="Run a test in the container")
 
@@ -59,15 +54,21 @@ def get_parser(test_func_en = False):
     app_subparsers = parser.add_subparsers(dest="app", help="Application to run/build")
 
     def add_app_subparsers(app_subparsers : argparse._SubParsersAction ):
+        """
+        Adds app-specific subparsers for each supported app.
+
+        Args:
+            app_subparsers (argparse._SubParsersAction): Top-level app subparsers to which app-specific subcommands are added.
+
+        Returns:
+            argparse._SubParsersAction: The updated app subparsers.
+        """
         for app_name in supported_apps:
             app_parser = app_subparsers.add_parser(app_name, help=f"{app_name} application")
             nested_app_parsers = add_nested_subparsers(app_parser)
         return app_subparsers
-    
-    
+
     app_subparsers = add_app_subparsers(app_subparsers)
-    
-    # cmd_subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     app_parser : argparse.ArgumentParser = app_subparsers.add_parser("app", help="Application commands")
     cmd_app_subparsers = app_parser.add_subparsers(title="app",dest="app", help="Application to run/build")
@@ -95,7 +96,20 @@ def get_parser(test_func_en = False):
     return parser
 
 def parse_args(parser : argparse.ArgumentParser,test_func = None):
+    """
+    Parse the command line arguments and call the appropriate handler based on the parsed arguments.
+
+    Args:
+        parser (argparse.ArgumentParser): The argument parser.
+        test_func (callable, optional): A function to run if 'test' command is issued.
+
+    Raises:
+        ValueError: If the test_func is not callable and 'test' command is issued.
+    """
     args = parser.parse_args()
+
+    if hasattr(args, "app") and args.app in supported_apps:
+        os.environ["APP_TYPE"] = args.app
     if (not hasattr(args, "app")) or isinstance(args.app, type(None)):
         parser.print_help()
         exit(1)
@@ -115,7 +129,6 @@ def parse_args(parser : argparse.ArgumentParser,test_func = None):
                 run_image_command(args, "/bin/bash -c terminator")
             else:
                 run_image_command(args, "/bin/bash")
-
         elif args.command == "test":
             if callable(test_func):
                 test_func(args)

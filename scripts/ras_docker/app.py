@@ -1,24 +1,3 @@
-"""
-Copyright (C) 2024 Harsh Davda
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For inquiries or further information, you may contact:
-Harsh Davda
-Email: info@opensciencestack.org
-"""
-
 from .arg_parser import argparse
 from .common import WORKING_PATH,partial,get_display_var,subprocess,WORKSPACE_BUILD_CMD as workspace_build_cmd,Path,get_docker_cmd_fmt,DockerCmdType,is_wsl
 from .vcs import init_setup,init_app_setup
@@ -27,6 +6,10 @@ from .docker import pull_from_docker_repo,TAG_SUFFIX,regen_docker_fmt,CoreDocker
 from dataclasses import dataclass, field, InitVar
 
 def init_app(args: argparse.Namespace):
+    """
+    Initialize the app environment by setting up workspace directories,
+    performing vcs repo initialization, and pulling required docker images.
+    """
     if not init_setup(args):
         return
     apps_path = WORKING_PATH/'apps'
@@ -37,19 +20,17 @@ def init_app(args: argparse.Namespace):
     app_path = apps_path/app_name
     if not init_app_setup(args):
         return
-    # repos_file = app_repos_path/f"{app_name}.repos"
-    # if not repos_file.exists():
-    #     print(f"Error: {repos_file} does not exist")
-    # if(vcs_fetch_repos(repos_file,apps_path,pull=True)):
-    #     dep_repos_file = app_path/"deps.repos"
-    #     vcs_fetch_repos(dep_repos_file,app_path,pull=True)
     force_pull = (hasattr(args,"image_pull") and args.image_pull)
     pull_from_docker_repo("ras_base",force_pull)
     pull_from_docker_repo(app_name,force_pull)
 
-
 @dataclass
 class AppCoreConf(CoreDockerConf):
+    """
+    Dataclass defining Docker configuration specific to an app.
+    Extends CoreDockerConf with app-specific fields such as
+    image name, container name, and working directory.
+    """
     app_ns:InitVar[str]
     image_name:str = field(init=False)
     container_name:str = field(init=False)
@@ -62,37 +43,61 @@ class AppCoreConf(CoreDockerConf):
         self.container_name = f"ras_{app_ns}_app"
         self.work_dir = f"/{self.app_name}/ros2_ws"
 
-
-
-def get_app_spacific_docker_cmd(args : argparse.Namespace,docker_cmd_fmt_src,remove_cn=True,extra_docker_args = ""):
+def get_app_spacific_docker_cmd(args: argparse.Namespace, docker_cmd_fmt_src, remove_cn=True, extra_docker_args=""):
+    """
+    Prepare the Docker command template for a specific app with appropriate
+    volumes, environment variables, and paths.
+    
+    Args:
+        args: Parsed CLI arguments containing app name and command type.
+        docker_cmd_fmt_src: Source Docker command formatter function.
+        remove_cn: Flag indicating if container should be removed after exit.
+        extra_docker_args: Additional Docker command-line arguments.
+    
+    Returns:
+        A callable that generates the formatted Docker command.
+    """
     app_conf = AppCoreConf(args.app)
-    app_path = WORKING_PATH/'apps'/app_conf.app_name
-    config_dir=str(WORKING_PATH/'configs')
-    asset_dir=str(WORKING_PATH/'assets')
+    app_path = WORKING_PATH / 'apps' / app_conf.app_name
+    config_dir = str(WORKING_PATH / 'configs')
+    asset_dir = str(WORKING_PATH / 'assets')
+
     if not app_path.exists():
         print(f"Error: {app_path} does not exist")
         print(f"Please run the init command first")
         exit(1)
+
+    docker_args = ""
     if remove_cn:
-        extra_docker_args += " --rm "
+        docker_args += " --rm "
+    
     if app_conf.app_name == "ras_server_app":
-        extra_docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
-    docker_cmd_fmt_local = partial(docker_cmd_fmt_src,
+        docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
+    
+    docker_args = f"-v {config_dir}:/{app_conf.app_name}/configs {docker_args}"
+
+    docker_cmd_fmt_local = partial(
+        docker_cmd_fmt_src,
         display_env=f"{get_display_var()}",
         app_dir=str(app_path),
-        work_dir="/"+app_conf.app_name,
-        extra_docker_args=f"-v {config_dir}:/{app_conf.app_name}/configs {extra_docker_args}"
+        work_dir="/" + app_conf.app_name,
+        extra_docker_args=docker_args
     )
-    allow_login = args.command in ["dev","run"]
-    docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local,app_conf,allow_login=allow_login)
-    if isinstance(docker_cmd_fmt_new,type(None)):
+
+    allow_login = args.command in ["dev", "run"]
+    docker_cmd_fmt_new = regen_docker_fmt(docker_cmd_fmt_local, app_conf, allow_login=allow_login)
+
+    if docker_cmd_fmt_new is None:
         print("Already Running")
         exit(1)
+
     return docker_cmd_fmt_new
 
-
 def build_image_app(args : argparse.Namespace):
-    
+    """
+    Build Docker image for the specified app, including base image if needed.
+    Optionally perform clean builds and force rebuilds.
+    """
     force_option = False
     clean_option = False
     offline_option = False
@@ -118,7 +123,6 @@ def build_image_app(args : argparse.Namespace):
     if (not image_exists) or force_option:
         _build_image()
 
-    
     setup_cmd = f"cd /{app_name}/scripts && ./setup.sh"
     workspace_path = f"/{app_name}/ros2_ws"
     run_command = f"{setup_cmd} && cd {workspace_path} && {workspace_build_cmd}"
@@ -134,8 +138,18 @@ def build_image_app(args : argparse.Namespace):
     else:
         print("*****Build error occurred. Image buuild will not be executed*****")
 
-
 def run_image_command(args : argparse.Namespace, command_str):
+    """
+    Run a shell command inside the app's Docker container. Optionally supports
+    launching VS Code in devcontainer mode.
+    
+    Args:
+        args: Parsed CLI arguments including app name and dev/root options.
+        command_str: Shell command to run inside the container.
+    
+    Returns:
+        The return code from the container command execution.
+    """
     app_conf = AppCoreConf(args.app)
     extra_docker_args = ""
     as_root=(hasattr(args,"root") and args.root)
@@ -155,7 +169,6 @@ def run_image_command(args : argparse.Namespace, command_str):
         vscode_ws = f"{dev_container_path}/{container_name}"
         code_cmd = f"code"
         if is_wsl():
-            # vscode_ws += "_wsl"
             code_cmd = "/mnt/c/Program Files/Microsoft VS Code/Code.exe"
             if not Path(code_cmd).exists():
                 print("Unwxpected vscode setup")
@@ -168,6 +181,10 @@ def run_image_command(args : argparse.Namespace, command_str):
     return run_image_command_core(docker_cmd_fmt_local,command_str,as_root=as_root)
 
 def run_image_commits(args : argparse.Namespace):
+    """
+    Commit changes made inside a running container to a new image and
+    optionally tag it for DockerHub push.
+    """
     docker_cmd_fmt_local = get_app_spacific_docker_cmd(args,get_docker_cmd_fmt(DockerCmdType.RAW),remove_cn=False)
     run_image_command_core(docker_cmd_fmt_local,"/bin/bash",as_root=True)
     app_conf = AppCoreConf(args.app)
@@ -177,13 +194,18 @@ def run_image_commits(args : argparse.Namespace):
         subprocess.run(f"docker tag {app_conf.image_name} {DOCKERHUB_REPO}:{app_conf.container_name}",check=True,shell=True)
     subprocess.run(f"docker rm {app_conf.container_name}",shell=True)
 
-
 def run_image_app(args : argparse.Namespace ):
+    """
+    Execute the app entrypoint inside its Docker container.
+    Runs `ras_app` after sourcing environment script.
+    """
     app_name = f"ras_{args.app}_app"
     bash_cmd = f"source /{app_name}/scripts/env.sh && ras_app " + " ".join(args.args)
     run_image_command(args=args, command_str=f"bash -c \"{bash_cmd}\"")
 
-
 def kill_app(args : argparse.Namespace):
+    """
+    Kill a running Docker container corresponding to the given app.
+    """
     app_conf = AppCoreConf(args.app)
     kill_docker_container(app_conf.container_name)

@@ -1,24 +1,3 @@
-"""
-Copyright (C) 2024 Harsh Davda
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For inquiries or further information, you may contact:
-Harsh Davda
-Email: info@opensciencestack.org
-"""
-
 from pathlib import Path
 from enum import Enum
 import ras_docker
@@ -34,14 +13,18 @@ ROS2_PKGS_PATH = WORKING_PATH/"ros2_pkgs"
 WORKSPACE_BUILD_CMD = "colcon build --symlink-install"
 
 class AssetType(Enum):
+    """
+    Enum for defining different asset types used in the system.
+    """
     NONE = None
-
     LAB = "labs"
     MANIPULATOR = "manipulators"
 
 class DockerCmdType(Enum):
+    """
+    Enum for specifying types of Docker commands to be used.
+    """
     NONE = None
-
     FULL = 1
     RAW = 2
     ATTACH = 3
@@ -50,6 +33,19 @@ import re
 from string import Formatter
 
 def parse_with_format(format_string, input_string):
+    """
+    Parses an input string using a Python format string template.
+
+    Args:
+        format_string (str): The format string with named fields.
+        input_string (str): The actual string to be parsed.
+
+    Returns:
+        dict: A dictionary mapping field names to parsed values.
+
+    Raises:
+        ValueError: If the input string does not match the format string.
+    """
     formatter = Formatter()
     pattern = "^"
     field_names = []
@@ -70,11 +66,30 @@ def parse_with_format(format_string, input_string):
     return match.groupdict()
 
 def is_wsl():
+    """
+    Checks if the current environment is a Windows Subsystem for Linux (WSL).
+
+    Returns:
+        bool: True if running in WSL, False otherwise.
+    """
     return Path("/proc/sys/fs/binfmt_misc/WSLInterop").exists()
 
 def get_docker_cmd_fmt(cmd_type: DockerCmdType):
+    """
+    Generates a Docker command format string or callable depending on the Docker command type.
+
+    Args:
+        cmd_type (DockerCmdType): The type of Docker command to generate.
+
+    Returns:
+        function: A partial function that can be called with required parameters to format a Docker command.
+
+    Raises:
+        ValueError: If the Docker command type is invalid or unexpected.
+    """
     docker_cmd_fmt_prefix = """docker run -it \
                 -e DISPLAY={display_env} \
+                -e APP_TYPE={app_type} \
                 --user {user_id}:{user_id} \
                 -v /etc/localtime:/etc/localtime:ro \
                 --name {container_name} \
@@ -128,7 +143,8 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     if (cmd_type==DockerCmdType.FULL):
         return partial(docker_cmd_fmt,
                 display_env=get_display_var(),
-                gpu_arg= docker_gpu_arg
+                gpu_arg= docker_gpu_arg,
+                app_type=os.environ.get("APP_TYPE", "robot")
             )
     elif (cmd_type==DockerCmdType.RAW):
         return partial(docker_cmd_fmt,
@@ -137,11 +153,32 @@ def get_docker_cmd_fmt(cmd_type: DockerCmdType):
     else:
         raise ValueError(f"Unexpected docker cmd_type{cmd_type}")
 
-
 def prepend_root_command(command_str:str):
+    """
+    Wraps a shell command string with `sudo` to execute it as root.
+
+    Args:
+        command_str (str): The original shell command.
+
+    Returns:
+        str: The command wrapped for sudo execution.
+    """
     return f"sudo -E bash -c '{command_str}'"
 
 def run_command_shell(command_str:str,as_root:bool=False,work_dir:Path=None,read_output=False,preview=True):
+    """
+    Executes a shell command using subprocess.
+
+    Args:
+        command_str (str): The command to execute.
+        as_root (bool): If True, runs the command as root.
+        work_dir (Path): Optional working directory.
+        read_output (bool): If True, captures the output.
+        preview (bool): If True, prints the command before execution.
+
+    Returns:
+        CompletedProcess: The result of subprocess.run.
+    """
     if isinstance(work_dir,Path):
         work_dir = str(work_dir)
     if as_root:
@@ -152,6 +189,15 @@ def run_command_shell(command_str:str,as_root:bool=False,work_dir:Path=None,read
                           capture_output=read_output)
 
 def run_functions_in_threads(functions_with_args):
+    """
+    Runs multiple functions in parallel using threads.
+
+    Args:
+        functions_with_args (list): List of tuples (function, args, kwargs).
+
+    Raises:
+        RuntimeError: If any function raises an exception.
+    """
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(partial(func, *args, **kwargs)) for func, args, kwargs in functions_with_args]
         for future in as_completed(futures):
@@ -161,8 +207,25 @@ def run_functions_in_threads(functions_with_args):
                 raise RuntimeError(f"Function execution failed: {e}")
 
 def run_command_list_in_threads(commands:list,as_root=False,work_dir:Path=None):
+    """
+    Executes a list of shell commands in parallel threads.
+
+    Args:
+        commands (list): List of shell command strings.
+        as_root (bool): Whether to run commands as root.
+        work_dir (Path): Optional working directory.
+
+    Returns:
+        None
+    """
     function_list = [(_cmd,None,{"as_root":as_root,"work_dir":work_dir}) for _cmd in commands]
     return run_functions_in_threads(function_list)
 
 def get_display_var():
+    """
+    Retrieves the DISPLAY environment variable.
+
+    Returns:
+        str: The value of DISPLAY from the environment.
+    """
     return os.environ['DISPLAY']
