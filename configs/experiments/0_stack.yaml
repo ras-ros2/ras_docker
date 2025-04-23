@@ -5,13 +5,13 @@
 
 # Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
-# - out1: Starting/ending position
+# - home: Starting/ending position
 # - above*: Positions above each location (for approach)
 # - in*: Positions at each location (for picking/placing)
 
 Poses:
   # Starting/home position - where the robot begins and ends
-  out1: {x: 20.0, y: 0, z: 50.0, roll: 3.14, pitch: 0, yaw: 0}
+  home: {x: 20.0, y: 0, z: 50.0, roll: 3.14, pitch: 0, yaw: 0}
   
   # First object location
   above1: {x: 41.7, y: 9.4, z: 28.0, roll: 3.14, pitch: 0, yaw: 0}
@@ -39,49 +39,35 @@ Poses:
   
 # Targets section defines the sequence of actions the robot will perform
 # Each operation follows the pattern:
-# 1. Move to starting position (out1)
-# 2. Move above object location
-# 3. Move to object location
-# 4. Close gripper (true)
-# 5. Move to previous above location
-# 6. Move above destination
-# 7. Move to destination
-# 8. Open gripper (false)
-# 9. Move to previous above location
+# 1. Move to home position
+# 2. Move above object location (above1)
+# 3. Pick at object location (in1)
+# 4. Move to destination (above4)
+# 5. Place at destination (in4)
+# 6. Repeat steps for different poses
+# 7. Move back to home position
 
 targets:
   # starting position
-  - move2pose: out1
+  - Move: home
 
   # Operation 1: Move object from position 1 to position 4
-  - move2pose: above1
-  - move2pose: in1
-  - gripper: true
-  - move2pose: above1
-  - move2pose: above4
-  - move2pose: in4
-  - gripper: false
-  - move2pose: above4
+  - Move: above1
+  - Pick: in1
+  - Move: above4
+  - Place: in4
 
   # Operation 2: Move object from position 2 to position 5 (first stack)
-  - move2pose: above2
-  - move2pose: in2
-  - gripper: true
-  - move2pose: above2
-  - move2pose: above5
-  - move2pose: in5
-  - gripper: false
-  - move2pose: above5
+  - Move: above2
+  - Pick: in2
+  - Move: above5
+  - Place: in5
 
   # Operation 3: Move object from position 3 to position 6 (second stack)
-  - move2pose: above3
-  - move2pose: in3
-  - gripper: true
-  - move2pose: above3
-  - move2pose: above6
-  - move2pose: in6
-  - gripper: false
-  - move2pose: above6
+  - Move: above3
+  - Pick: in3
+  - Move: above6
+  - Place: in6
 
   # Return to starting position
-  - move2pose: out1
+  - Move: home

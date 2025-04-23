@@ -5,7 +5,7 @@
 
 Poses:
   # Starting/home position - where the robot begins and ends
-  out1: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
+  home: {x: 20, y: 0, z: 50, roll: 3.14, pitch: 0, yaw: 0}
   
   # First object location
   above1: {x: 20, y: -35, z: 33, roll: 3.14, pitch: 0, yaw: -1.575}  # Approach position
@@ -31,44 +31,35 @@ Poses:
 
 # Targets section defines the sequence of actions the robot will perform
 # Each operation follows the pattern:
-# 1. Move to starting position
+# 1. Move to home position
 # 2. Move above object location
-# 3. Move to object location
-# 4. Close gripper (true)
-# 5. Move back to above location
-# 6. Move to the next position
-# 7. Open gripper (false)
-# 8. Move back to transition position
+# 3. Move to object location (Pick)
+# 4. Move to the next position (Place)
+# 5. Move back to transition position
 
 targets:
   # Move to starting position
-  - move2pose: out1
+  - Move: home
   
   # Operation 1: Pick from position 1 and move to position 2
-  - move2pose: above1
-  - move2pose: in1
-  - gripper: true  # Close gripper
-  - move2pose: above1
-  - move2pose: out2
-  - move2pose: above2
-  - move2pose: in2
-  - gripper: false  # Open gripper
-  - move2pose: above2
-  - move2pose: out2
+  - Move: above1
+  - Pick: in1
+  - Move: out2
+  - Move: above2
+  - Place: in2
+  - Move: out2
   
   # Operation 2: Pick from position 3 and move to position 4
-  - move2pose: out3
-  - move2pose: front3
-  - move2pose: in3
-  - gripper: true  # Close gripper
-  - move2pose: up4
-  - move2pose: left4
+  - Move: out3
+  - Move: front3
+  - Pick: in3
+  - Move: up4
+  - Move: left4
   
   # Rotation actions
   - rotate: -1.57
   - rotate: 1.57
   
   # Operation 3: Move to final position
-  - move2pose: above5
-  - move2pose: out5
-  - gripper: false  # Open gripper
+  - Move: above5
+  - Place: out5
