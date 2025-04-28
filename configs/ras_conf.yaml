@@ -2,10 +2,10 @@ ras:
   transport:
     implementation: default
     file_server:
-      use_external: false
-      ip: localhost
-      port: 2122
+      use_external: true
+      ip: dev2.deepklarity.ai
+      port: 9501
     mqtt:
-      use_external: false
-      ip: localhost
-      port: 2383
+      use_external: true
+      ip: dev2.deepklarity.ai
+      port: 9500

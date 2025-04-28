@@ -1,0 +1,77 @@
+# This file defines a sequence of robot movements and actions for picking and placing objects
+# This file performs a single stack of 3 blocks.
+
+# Poses section defines all the positions the robot can move to
+
+# Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
+
+# - home: Starting/ending position
+# - above*: Positions above each location (for approach)
+# - in*: Positions at each location (for picking/placing)
+
+# reference pose marked on table as 'x' is {x: 20.0, y: 0, z: 8.41, roll: 3.14, pitch: 0, yaw: 0}
+Poses:
+  # Starting/home position - where the robot begins and ends
+  home: {x: 20.0, y: 0.0, z: 50.0, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # First object location
+  above1: {x: 35.0, y: 10.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in1: {x: 35.0, y: 10.0, z: 8.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Second object location
+  above2: {x: 35.0, y: 0.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in2: {x: 35.0, y: 0.0, z: 8.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Third object location
+  above3: {x: 35.0, y: -10.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in3: {x: 35.0, y: -10.0, z: 8.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Fourth location positions (for placing first object)
+  above4: {x: 20.0, y: 0.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in4: {x: 20.0, y: 0.0, z: 8.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Fifth location positions (for stacking - first level, for placing second object)
+  above5: {x: 20.0, y: 0.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in5: {x: 20.0, y: 0.0, z: 11.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+  # Sixth location positions (for stacking - second level, for placing third object)
+  above6: {x: 20.0, y: 0.0, z: 20.0, roll: 3.14, pitch: 0, yaw: 0}
+  in6: {x: 20.0, y: 0.0, z: 14.5, roll: 3.14, pitch: 0, yaw: 0}
+  
+# Targets section defines the sequence of actions the robot will perform
+# Each operation follows the pattern:
+# 1. Move to home position
+# 2. Move above object location (above1)
+# 3. Pick at object location (in1)
+# 4. Move to destination (above4)
+# 5. Place at destination (in4)
+# 6. Repeat steps for different poses
+# 7. Move back to home position
+
+targets:
+  # starting position
+  - Move: home
+
+  # Operation 1: Move object from position 1 to position 4
+  - Move: above1
+  - Pick: in1
+  - Move: above4
+  - Place: in4
+  - Move: above4
+
+  # Operation 2: Move object from position 2 to position 5 (first stack)
+  - Move: above2
+  - Pick: in2
+  - Move: above5
+  - Place: in5
+  - Move: above5
+
+  # Operation 3: Move object from position 3 to position 6 (second stack)
+  - Move: above3
+  - Pick: in3
+  - Move: above6
+  - Place: in6
+  - Move: above6
+  
+  # Return to starting position
+  - Move: home

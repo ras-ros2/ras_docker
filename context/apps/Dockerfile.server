@@ -12,7 +12,6 @@ RUN pip install boto3 awsiotsdk
 
 RUN echo "source /ras_server_app/scripts/env.sh" >> /etc/bash.bashrc
 
-
 WORKDIR /
 SHELL ["/bin/bash","-c"]
 USER ras

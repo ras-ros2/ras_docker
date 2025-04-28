@@ -1,3 +1,4 @@
+
 # This file defines a sequence of robot movements and actions
 # It specifies poses and a set of targets for robot motion
 # Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
