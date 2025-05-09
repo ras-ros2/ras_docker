@@ -15,10 +15,12 @@ home_joint_state:  # Default joint angles for the home position
   joint6: 0
 constraints:  # Motion constraints for the robot
   workspace:  # Allowable workspace limits in meters
-    x: [-2.0, 2.0]
-    y: [-4.0, 4.0]
-    z: [0.0, 2.0]
+    x: [-44.0, 44.0]
+    y: [-44.0, 44.0]
+    z: [0.0, 50.0]
   orientation:  # Allowed orientation range in radians
     roll: [-3.14, 3.14]
     pitch: [-3.14, 3.14]
     yaw: [-3.14, 3.14]
+  max_gripper_open_width: 3.8  # Maximum width of the gripper open in centimeters
+  min_gripper_open_width: 2.2  # Minimum width of the gripper open in centimeters
