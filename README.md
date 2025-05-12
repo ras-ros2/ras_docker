@@ -197,5 +197,6 @@ Your app is now set up and running. If you face any issues:
 - For GUI interaction, [UFactory Studio README](UFactory_Studio_App_readme.md).
 - Refer this [RAS Server Setup README](RAS_Server_Setup_readme.md). for complete Server Setup.
 - Refer this [RAS Robot Setup README](RAS_Robot_Setup_readme.md). for complete Server Setup.
+- Refer this [RAS Workspace Setup README](RAS_Workspace_Setup_readme.md). for complete Physical workspace Setup.
   
 For further assistance, refer to the documentation or raise an issue on the project repository.
