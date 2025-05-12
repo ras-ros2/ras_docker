@@ -16,6 +16,20 @@ Measure 20cm using a scale along the x-axis and mark it as (20,0). This will be 
 
 ![Home position at 20cm](images/workspace_2.jpeg)
 
+## Workspace Constraints for xArm Lite 6
+
+The xArm Lite 6 has the following approximate workspace limits:
+- X-axis (forward/backward): ±44 cm
+- Y-axis (left/right): ±44 cm
+- Z-axis (up/down): Up to 50 cm
+
+**Important Notes:**
+- Since the arm is a 6 DOF robot that moves in a spherical workspace, the actual constraints at each point vary.
+- The RAS system includes a built-in function to check if a given pose is within the robot's reachable workspace.
+- If a position is outside the reachable workspace, the system will throw an error.
+- Always verify your robot's specific constraints before setting up the workspace.
+- Test movements slowly when working with new positions to ensure safety.
+
 ### Step 3: Mark Object Positions
 Measure 15cm from the home position (or 35cm from origin) along the x-axis and mark it as (35,0). This will be the point where wooden block/object for the experiment will be placed.
 
