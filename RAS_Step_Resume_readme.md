@@ -5,7 +5,7 @@ This guide provides instructions on how to resume experiments and start experime
 ## Table of Contents
 - [Resuming an Experiment](#resuming-an-experiment)
 - [Starting an Experiment from a Specific Step](#starting-an-experiment-from-a-specific-step)
-- [Common Troubleshooting](#common-troubleshooting)
+
 
 ## Resuming an Experiment
 
