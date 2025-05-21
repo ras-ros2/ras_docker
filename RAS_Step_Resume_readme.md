@@ -15,7 +15,7 @@ If your experiment execution was interrupted due to server restart or any other 
  
 You will be prompted to resume the experiment, as shown in the image below:
 
-![image](https://github.com/Robotics-Club-of-America/ras_docker/assets/13252568/5b5b5b5b-5b5b-5b5b-5b5b-5b5b5b5b5b5b)
+![experiment_state](images/resume_1.png)
 
 This shows the last executed step and the experiment name.
 
@@ -39,7 +39,7 @@ The file contains information like this:
 ```json
 {"experiment_id": "0_stack", "current_step_index": 13, "timestamp": "2025-05-21T18:42:56.936861"}
 ```
-![image](https://github.com/Robotics-Club-of-America/ras_docker/assets/13252568/5b5b5b5b-5b5b-5b5b-5b5b-5b5b5b5b5b5b)
+![experiment_state](images/resume_2.png)
 ### 2. Start from a Specific Step
 
 To start an experiment from a specific step:
