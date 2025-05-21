@@ -198,5 +198,6 @@ Your app is now set up and running. If you face any issues:
 - Refer this [RAS Server Setup README](RAS_Server_Setup_readme.md). for complete Server Setup.
 - Refer this [RAS Robot Setup README](RAS_Robot_Setup_readme.md). for complete Server Setup.
 - Refer this [RAS Workspace Setup README](RAS_Workspace_Setup_readme.md). for complete Physical workspace Setup.
+- Refer this [RAS Workspace Setup README](RAS_Step_Resume_readme.md). for complete resuming and execution from particular step of experiment.
   
 For further assistance, refer to the documentation or raise an issue on the project repository.
