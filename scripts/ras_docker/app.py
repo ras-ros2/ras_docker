@@ -74,7 +74,9 @@ def get_app_spacific_docker_cmd(args: argparse.Namespace, docker_cmd_fmt_src, re
     if app_conf.app_name == "ras_server_app":
         docker_args += f" -v {asset_dir}:/{app_conf.app_name}/ros2_ws/src/assets "
     
-    docker_args = f"-v {config_dir}:/{app_conf.app_name}/configs {docker_args}"
+    # Mount cache directory similar to configs directory
+    cache_dir = str(WORKING_PATH / 'cache')
+    docker_args = f"-v {config_dir}:/{app_conf.app_name}/configs -v {cache_dir}:/{app_conf.app_name}/cache {docker_args}"
 
     docker_cmd_fmt_local = partial(
         docker_cmd_fmt_src,
