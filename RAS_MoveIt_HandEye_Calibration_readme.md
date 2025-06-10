@@ -134,8 +134,11 @@ Next, capture a calibration dataset with multiple samples to ensure a good calib
 2. The calibration will improve with more samples and typically plateaus after about 12-15 samples
 3. The position and orientation will be displayed on the "Context" tab
 4. Click "Save camera pose" to export the calibration result
+5. Save the calibration result in the calibration folder(ras_robot_app/configs/static_calibration_configs/)
 ![Hand-Eye Calibration Demo](images/hand_eye_save.png)
 
+6. The saved calibration result will be used by the robot(fake_tf.py) to transform the camera frame to the robot base frame , mention the file name in the lab_setup.yaml file(label: static_calibration_file) which is in configs/
+![Hand-Eye Calibration Demo](images/hand_eye_usage.png)
 ## Troubleshooting
 
 ### Common Issues
