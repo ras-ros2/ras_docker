@@ -2,7 +2,7 @@
 
 This document explains the hand-eye calibration process for the RAS (Robot Automation System) using MoveIt and ROS 2. Hand-eye calibration is essential for accurate robot manipulation tasks where visual information from a camera needs to be transformed into the robot's coordinate system.
 
-![Hand-Eye Calibration Demo](images/hand_eye_1.jpg)
+![Hand-Eye Calibration Demo](images/hand_eye_1.png)
 
 ## Overview
 
@@ -74,8 +74,8 @@ In the RViz "Displays" panel, click "Add" and select the "HandEyeCalibration" di
 
 In the "Target Params" section of the "Target" tab, configure the target parameters:
 
-- **markers, X**: 3
-- **markers, Y**: 4
+- **markers, X**: 2
+- **markers, Y**: 2
 - **marker size (px)**: 200
 - **marker separation (px)**: 20
 - **marker border (bits)**: 1
