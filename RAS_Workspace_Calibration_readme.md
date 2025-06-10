@@ -27,39 +27,59 @@ This document explains the workspace calibration process for the RAS (Robot Auto
 
 ## Calibration Process
 
-1. The `aruco_calibration.py` script (running in the robot's perception module) will:
-   - Detect the 4 ArUco markers
-   - Calculate the center point of the workspace i.e,(TARGET)
-   - Publish the calibrated workspace center (x, y, z in centimeters) to MQTT topic:
-     ```
-     robot/calibration_command
-     ```
+Launch the server application and robot application
 
-![calibration](images/calibration_2.jpg)
+```bash
+ras server run
+```
 
-2. The server application's `calibration_target_subscriber.py` will:
-   - Subscribe to the MQTT topic `robot/calibration_command`
-   - Receive the calibrated center point coordinates
-   - Store the data in `calibration_data.json`
+```bash
+ras robot run
+```
+next run the calibration command
+from server to trigger calibration script in robot
 
-![calibration](images/calibration_3.png)
+```bash
+ras_cli calibrate
+```
+ This will run the calibration script(aruco_calibration.py) in robot and keep sending the calibration data to server(in same terminal where calibration command is run).
+
+![markers](images/calibration_start.png)
+
+When the user is satisfied with the calibration data, the user can stop the calibration process by pressing 'Enter' key.
+The user will prompted to give a custom name for the calibration json file ,if user does not give a name, the default name will be used (xarm_calibration_{timestamp}.json).
+
+![markers](images/calibration_end.png)
+
+The calibration data is nothing but the center point of the workspace(4 ArUco markers) TARGET point mentioned in the image.
+
+![markers](images/calibration_2.jpg)
+
+When the calibration is running in robot, the server can view the live feed of the calibration process in the rqt_gui which is launched in the new window when the calibration command is run.
+
+![markers](images/calib_rqt1.png)
+
+Select the calibration topic(aruco_calibration/processed_image/compressed) to view the live feed of the calibration process.
+
+![markers](images/calib_rqt2.png)
+
 
 ## Using Calibration in Experiments
 
-In your experiment configuration file, you can enable or disable the use of calibration data using the `use_calibration` flag:
+In your experiment configuration file, you can enable or disable the use of calibration data using the `calibration_file_path` flag:
 
 ```yaml
-use_calibration: true  # or false
+calibration_file_path: test.json  # or None
 ```
 
 ### Behavior Based on Flag(example for same experiment file - 0_stack.yaml)
 
-- **When `use_calibration: false` (default):**
+- **When `calibration_file_path: None` (default):**
   - All object positions in the experiment file are relative to the robot's base_link (0,0,0)
 
 ![calibration](images/calibration_4.png)
 
-- **When `use_calibration: true`:**
+- **When `calibration_file_path: {custom_name/default_name}.json`:**
   - All object positions in the experiment file are relative to the calibrated workspace center point i.e,(TARGET example here x=34cm and y=0cm)
   - The system will automatically adjust coordinates based on the stored calibration data
 
@@ -71,12 +91,13 @@ The calibration data is stored in `calibration_data.json` with the following for
 
 ```json
 {
-    "workspace_center": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
+    "calibration": {
+        "x": 32,
+        "y": 0,
+        "z": 0,
+        "timestamp": "2025-06-09 15:16:30"
     },
-    "timestamp": "2025-05-25T11:02:22.123456"
+    "saved_at": "2025-06-09 15:16:31"
 }
 ```
 
