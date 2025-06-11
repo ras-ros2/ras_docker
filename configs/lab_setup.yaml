@@ -8,4 +8,6 @@ lab_setup:
 
   robot_name: "xarm_lite6"  # Primary robot in the setup
   robot_config_file: "robots/{robot_name}.yaml"
+
+  static_calibration_file: "static_test.launch.py"
  

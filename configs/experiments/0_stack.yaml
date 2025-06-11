@@ -2,7 +2,7 @@
 # This file performs a single stack of 3 blocks.
 
 # Poses section defines all the positions the robot can move to
-
+calibration_file_path: None
 # Each pose has x, y, z coordinates in centimeters and orientation (roll, pitch, yaw) in radians
 
 # - home: Starting/ending position
